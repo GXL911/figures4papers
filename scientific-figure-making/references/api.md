@@ -67,6 +67,7 @@ block/hierarchical resampling.
 - validate_reliability(nominal,empirical)
 - validate_bar_artists(container,expected): check Matplotlib bar heights.
 - validate_line_artist(line,x,y): check plotted x/y arrays.
+- validate_color_semantics(fig): warn when a series changes colors across panels.
 - validate_figure(fig): report warning diagnostics about axis labels,
   truncated bar axes and invalid limits. Manual visual review is required.
 

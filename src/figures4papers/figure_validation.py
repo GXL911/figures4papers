@@ -78,6 +78,44 @@ def validate_line_artist(line, x, y, *, atol: float = 1e-10) -> None:
             not np.allclose(yy, expected_y, atol=atol)):
         raise ValidationError("Drawn line does not match plot data.")
 
+def validate_color_semantics(fig) -> list[ValidationIssue]:
+    """Warn when the same labeled series has different colors across panels.
+
+    Only legend-labeled Line2D and BarContainer artists are inspected.
+    Different labels may intentionally share colors, so no uniqueness rule
+    is imposed. This is a partial, not complete accessibility check.
+    """
+    from matplotlib.colors import to_rgba
+    seen: dict[str, tuple[float, ...]] = {}
+    issues: list[ValidationIssue] = []
+    for panel, ax in enumerate(fig.axes):
+        if not ax.get_visible() or not ax.axison:
+            continue
+        handles, labels = ax.get_legend_handles_labels()
+        for h, label in zip(handles, labels):
+            if not label or label.startswith("_"):
+                continue
+            if isinstance(h, BarContainer):
+                if not h.patches:
+                    continue
+                color = h.patches[0].get_facecolor()
+            elif hasattr(h, "get_color"):
+                color = h.get_color()
+            else:
+                continue
+            try:
+                normalized = tuple(to_rgba(color))
+            except (ValueError, TypeError):
+                continue
+            if label in seen and not np.allclose(seen[label], normalized, atol=1e-8):
+                issues.append(ValidationIssue(
+                    "warning", "inconsistent_series_color",
+                    f"Series {label!r} changes color in panel {panel}."
+                ))
+            else:
+                seen.setdefault(label, normalized)
+    return issues
+
 def validate_figure(fig, *, require_axis_labels: bool = True, bar_zero_warning: bool = True) -> list[ValidationIssue]:
     """Check actual Matplotlib axes; warnings need human interpretation.
 

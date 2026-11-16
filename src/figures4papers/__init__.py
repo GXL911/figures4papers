@@ -15,6 +15,7 @@ from .figure_validation import (
     ValidationError, ValidationIssue, validate_numeric_array,
     validate_grouped_inputs, validate_intervals, validate_figure,
     validate_bar_artists, validate_line_artist, validate_reliability,
+    validate_color_semantics,
 )
 from .provenance import file_sha256, build_manifest
 

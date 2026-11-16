@@ -57,3 +57,12 @@ def test_empty_figure():
     fig=plt.figure()
     with pytest.raises(ValidationError): validate_figure(fig)
     plt.close(fig)
+
+def test_color_semantics_across_panels():
+    from figures4papers import validate_color_semantics
+    fig,axes=plt.subplots(1,2)
+    axes[0].plot([0,1],[1,2],label="Proposed",color="#0F4D92")
+    axes[1].plot([0,1],[1,2],label="Proposed",color="#B64342")
+    issues=validate_color_semantics(fig)
+    assert "inconsistent_series_color" in [item.code for item in issues]
+    plt.close(fig)
