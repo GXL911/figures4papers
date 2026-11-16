@@ -45,7 +45,9 @@ def summarize_seeds(samples, spec: UncertaintySpec, *, axis: int = 0) -> Summary
     x = np.asarray(samples, dtype=float)
     if x.ndim < 1 or not x.size or not np.isfinite(x).all():
         raise ValueError("samples must be a nonempty finite numeric array.")
-    axis = np.core.numeric.normalize_axis_index(axis, x.ndim)
+    if not isinstance(axis, (int, np.integer)) or not -x.ndim <= axis < x.ndim:
+        raise ValueError("axis must index an existing sample dimension.")
+    axis = axis % x.ndim
     n = x.shape[axis]
     if spec.kind != "none" and n < 2:
         raise ValueError("Uncertainty needs at least two independent replicates.")

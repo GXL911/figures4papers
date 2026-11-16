@@ -33,7 +33,7 @@ class FigureStyle:
     font_size: float = 11
     axes_linewidth: float = 1.2
     use_tex: bool = False
-    font_family: tuple[str, ...] = ("DejaVu Sans", "Arial", "Helvetica", "sans-serif")
+    font_family: tuple[str, ...] = ("DejaVu Sans", "sans-serif")
 
     def __post_init__(self):
         if self.font_size <= 0 or self.axes_linewidth <= 0:

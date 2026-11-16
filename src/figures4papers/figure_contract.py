@@ -17,6 +17,8 @@ class FigureContract:
     provenance_note: str = ""
 
     def __post_init__(self):
+        if self.chart_type not in ("grouped_bar", "learning_curves", "heatmap", "reliability", "other"):
+            raise ValueError("Unknown chart_type.")
         for name in ("figure_id", "takeaway", "source_description"):
             if not getattr(self, name).strip():
                 raise ValueError(f"FigureContract.{name} cannot be blank.")

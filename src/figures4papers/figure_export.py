@@ -41,6 +41,8 @@ def finalize_figure(fig, out_path, formats=None, dpi: int = 300, close: bool = T
 
     if dpi < 72 or pad < 0:
         raise ValueError("DPI must be >=72 and padding nonnegative.")
+    if source_files and contract is None:
+        raise ValueError("source_files requires an explicit FigureContract.")
     target = Path(out_path)
     if formats is None:
         formats = (target.suffix.lstrip(".").lower(),) if target.suffix else ("png", "pdf", "svg")
