@@ -1,3 +1,36 @@
+# Fork development: Research Figure Making v0.1
+
+This GXL911 fork extends Chen Liu's figures4papers case-study repository with
+an installable plotting package, scientific validation, templates, and agent
+workflow documentation. Original figures and original README are preserved
+below. The original first-person biography refers to **Chen Liu**, not to the
+fork maintainer.
+
+## Quick start (Python >= 3.10)
+
+    python -m pip install -e ".[dev]"
+    python -m pytest -q
+    python examples/run_all.py --out examples/generated
+
+**The four new templates contain synthetic teaching values, not reported
+scientific measurements.** Their outputs include PNG, PDF, SVG and optional
+SHA256 provenance manifests.
+
+New components:
+- src/figures4papers/: validated plotting, statistics, export and contracts.
+- templates/: grouped bars, learning curves, heatmap, reliability.
+- tests/: numerical, statistical, artist, export and example verification.
+- scientific-figure-making/SKILL.md: AI agent workflow.
+- scientific-figure-making/references/figure-catalog.md: all 30 Python scripts.
+- RESEARCH_PROJECT_REVIEW.zh-CN.md: baseline findings and limitations.
+
+The upstream LICENSE is CC BY-NC 4.0. This fork does not relicense original
+material. Commercial reuse of covered material requires appropriate permission.
+
+---
+
+## Upstream README (preserved)
+
 <div align="center">
 
 <h1><code>Figures for Papers</code></h1>

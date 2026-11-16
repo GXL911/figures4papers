@@ -13,3 +13,15 @@
 **/*.npz
 **/*.csv
 **/*.html
+
+# Fork development and temporary outputs
+.venv/
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+examples/generated/
+templates/figures/
+.coverage
+htmlcov/
