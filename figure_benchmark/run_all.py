@@ -3,6 +3,9 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+import matplotlib
+matplotlib.use("Agg", force=True)
+
 from .resnet_mechanism import build as resnet
 from .mamba_hardware import build as mamba
 from .nature_composite import build as composite
