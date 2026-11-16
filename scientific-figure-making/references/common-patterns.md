@@ -1,74 +1,31 @@
-# Common Patterns for Publication Figures
+# Common Patterns for Publication Figures — v0.2
 
-These patterns are used across the repository for consistent, publication-ready figures. Apply them when building bar charts, multi-panel layouts, and print-safe graphics. Step-by-step flows that use many of these ideas are in [tutorials.md](tutorials.md); for chart types not covered there, use the closing section of that file and [demos.md](demos.md).
+These are conditional design patterns, not rules to apply mechanically. Start with the scientific claim and final physical dimensions. See [design-system-v0.2.md](design-system-v0.2.md) for the normative design system.
 
----
+## Paired seed comparison
 
-## Ultra-wide aspect for multi-metric panels
+Use when methods share the same independent random seeds or experimental replicates. Connect each matched pair, show the per-seed differences, and report a clearly named summary interval. Do not discard pairing by showing unrelated bars. Do not treat time points within one run as independent seeds.
 
-For 3-4 metrics or many categories in a single row, use a wide canvas so bars/labels don't crowd vertically.
+## Factorial ablation matrix
 
-- **Example:** `figsize=(45, 12)` or `(28, 6)`.
-- **Rule:** Width often 3-4× height for comparison bars.
-- **Why:** Lets the reader scan left-to-right without squinting; keeps y-axis and legend readable.
+Use a heatmap when rows and columns are meaningful experimental factors and the cells represent valid combinations. Fix and disclose the color scale. If the matrix is asymmetric, do not imply symmetry. Include the actual numeric values when exact comparisons matter.
 
----
+## Scaling and efficiency
 
-## Dedicated legend panel
+Separate quality from cost when they have different units. Use log axes only when the multiplicative scale is scientifically meaningful, label them, and show the measured range. Avoid dual axes that imply a direct numerical comparison between unrelated quantities.
 
-When multiple curves or groups make the legend large, put it in its own subplot so it doesn't cover data.
+## Qualitative plus quantitative evidence
 
-- **Steps:**
-  1. Create one extra subplot (e.g. last in the grid).
-  2. Call `ax.set_axis_off()` on that axis.
-  3. Build the legend on that axis (e.g. gather handles/labels from other axes and call `ax.legend(handles, labels)` there), or use a single legend that you place in the extra axis.
-- **Result:** Data panels stay clean; legend is fully visible.
+Show the input, model-derived output, and a clearly described overlay or comparison. Pair it with a metric computed under a stated threshold or criterion. Label illustrative examples and representative-case selection.
 
----
+## Architecture and mechanism diagrams
 
-## Categorical bars without x-tick labels
+Use the diagram engine for simple vector primitives and dataflow. Keep one visual grammar for inputs, operations, state, outputs and control paths. Explain simplifications. For a complicated graph, use a dedicated layout tool rather than forcing it into a manually positioned row of boxes.
 
-When the x-axis is "method" or "condition" and the legend already identifies them, hide x ticks and rely on the legend/title.
+## Multi-panel composites
 
-- **Code:** `ax.set_xticks([])` or set tick labels to empty.
-- **Use when:** Many methods across multiple metrics; names are in the legend or panel title.
+Use the composer for fixed-width SVG/PDF/PNG composition. Make the reading order explicit, use panel labels consistently, and do not shrink panels just to fit a grid. If panel content becomes too dense, change the grid or make a separate figure.
 
----
+## Historical patterns that are not defaults
 
-## Dynamic y-axis scaling
-
-Tighten y-limits to the relevant range so differences are visible instead of squashed.
-
-- **Idea:** Use something like `data.min() - margin` to `data.max() + margin` (e.g. margin = small fraction of range or one std).
-- **Avoid:** Fixed 0-100 when all values are in 85-95; use e.g. 80-100 instead.
-
----
-
-## Bar edge and hatch for print-safe separation
-
-Bars that differ only by fill can blur in grayscale. Use edges and optional hatching.
-
-- **Edges:** `edgecolor='black'`, `linewidth=1.5`-`3` for clear separation.
-- **Hatch:** Same color with different hatch (e.g. `'/'`, `'\\'`, `'.'`) for ablation or subgroups so they remain distinct in print.
-
----
-
-## Semantic color mapping
-
-Stick to the skill palette so "proposed vs baseline" is consistent across figures.
-
-- **Blues:** Proposed method / key result.
-- **Greens:** Improvements / positive variants.
-- **Reds:** Baselines / contrasts / alternatives.
-- **Neutral:** Reference or background categories.
-- **Highlight:** Single callout only.
-
-See [design-theory.md](design-theory.md) for the full palette and [api.md](api.md) for `PALETTE` and `DEFAULT_COLORS`.
-
-## Related files
-
-- [SKILL.md](../SKILL.md) — When to load this skill
-- [api.md](api.md) — `PALETTE`, helpers, validation
-- [demos.md](demos.md) — Real scripts mirroring these patterns
-- [design-theory.md](design-theory.md) — Visual and color theory
-- [tutorials.md](tutorials.md) — Walkthroughs that apply these patterns
+The upstream case-study scripts contain useful examples of wide canvases, large typography, manually adjusted axes and dedicated legend panels. These are observations about those scripts, not universal recommendations. In particular, do not default to ultra-wide canvases, crop y-axes automatically, or apply the same font size regardless of final physical width.

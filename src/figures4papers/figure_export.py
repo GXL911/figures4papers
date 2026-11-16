@@ -10,6 +10,28 @@ from .figure_contract import FigureContract
 from .provenance import build_manifest
 
 SUPPORTED_FORMATS = {"pdf", "svg", "eps", "png", "jpg", "jpeg", "tif", "tiff"}
+SVG_NS = "http://www.w3.org/2000/svg"
+ET.register_namespace("", SVG_NS)
+
+
+def _add_svg_accessibility(path: Path, contract: FigureContract) -> None:
+    tree = ET.parse(path)
+    root = tree.getroot()
+    title = next((node for node in root if node.tag.endswith("title")), None)
+    if title is None:
+        title = ET.Element(f"{{{SVG_NS}}}title")
+        root.insert(0, title)
+    title.set("id", "figure-title")
+    title.text = f"Figure {contract.figure_id}: {contract.takeaway}"
+    desc = next((node for node in root if node.tag.endswith("desc")), None)
+    if desc is None:
+        desc = ET.Element(f"{{{SVG_NS}}}desc")
+        root.insert(1, desc)
+    desc.text = contract.source_description
+    root.set("role", "img")
+    root.set("aria-labelledby", "figure-title")
+    tree.write(path, encoding="utf-8", xml_declaration=True)
+
 
 def _check_export(path: Path) -> None:
     if not path.is_file() or path.stat().st_size < 32:
@@ -60,6 +82,8 @@ def finalize_figure(fig, out_path, formats=None, dpi: int = 300, close: bool = T
         for fmt in formats:
             path = base.with_suffix("." + fmt)
             fig.savefig(path, format=fmt, dpi=dpi, bbox_inches="tight" if crop else fig.bbox_inches, pad_inches=pad)
+            if fmt == "svg" and contract is not None:
+                _add_svg_accessibility(path, contract)
             _check_export(path)
             saved.append(path)
         if contract is not None:

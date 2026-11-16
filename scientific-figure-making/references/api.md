@@ -1,4 +1,4 @@
-# Executable Figure Making API — Fork v0.1
+# Executable Figure Making API — Fork v0.2
 
 This fork supplies a real Python implementation in src/figures4papers;
 the upstream reference originally described functions to implement.
@@ -6,7 +6,7 @@ The original figure_* scripts are preserved and are not yet migrated.
 
 ## Install and execute
 
-    python -m pip install -e ".[dev]"
+    python -m pip install -e ".[dev,illustration]"
     python -m pytest -q
     python examples/run_all.py --out examples/generated
 
@@ -97,3 +97,43 @@ instead of exporting with a tight bounding box. For a figure with more than one
 whisker convention, use `FigureContract(..., uncertainty_kind="mixed",
 uncertainty_by_metric={"AUROC": "sd", "AUPRC": "sd", "Mean PPVn": "sem"})`.
 Specify the convention in the displayed figure as well as the manifest.
+
+
+## v0.2 physical design tokens
+
+Import `DesignTokens`, `FigurePreset`, `SINGLE_COLUMN`, `DOUBLE_COLUMN`
+and `publication_context` from `figures4papers.design_tokens`. Presets define
+89 mm and 178 mm starting widths. The context manager applies rcParams without
+leaking global style changes.
+
+```python
+from figures4papers.design_tokens import SINGLE_COLUMN, publication_context
+
+with publication_context():
+    fig, ax = plt.subplots(figsize=SINGLE_COLUMN.figsize_inches)
+    ...
+```
+
+## v0.2 SVG diagrams and composition
+
+- `DiagramCanvas(width_mm, height_mm, title=...)`: build vector boxes, text,
+  circles, lines and arrows. Coordinates are millimetres; text and line widths
+  are supplied in points. Element IDs must be unique.
+- `export_svg(svg, out_path, formats=("svg","pdf","png"), contract=...)`:
+  validate and export SVG-native scenes. PDF/PNG conversion requires
+  `pip install -e ".[illustration]"`.
+- `FigureComposer(width_mm=178, columns=2, panel_height_mm=...)`: compose
+  SVG and Matplotlib panels with namespaced IDs and a physical-size canvas.
+- `audit_svg(svg, min_font_pt=6)`: inspect title/role/viewBox, duplicate IDs
+  and declared text sizes. It does not prove final physical readability.
+- `audit_palette(colors, background="#FFFFFF")` and
+  `contrast_ratio(foreground, background)`: screen text contrast and
+  grayscale-similar color pairs. This is not a full accessibility certification.
+
+See `diagram-engine.md`, `figure-composer.md`, and
+`design-system-v0.2.md` for complete usage and limitations. The six original
+benchmark figures can be generated with:
+
+    python -m figure_benchmark.run_all --out figure-benchmark/generated
+
+All benchmark values and toy images are synthetic teaching data.

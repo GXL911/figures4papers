@@ -19,7 +19,7 @@ from immunostruct_publication import PANELS, panel_data, render_all
 
 
 def test_script_manifest_and_output_identity():
-    scripts = {p.relative_to(ROOT).as_posix() for p in ROOT.glob("figure_*/*.py") if p.name != "raw_data.py"}
+    scripts = {p.relative_to(ROOT).as_posix() for p in ROOT.glob("figure_*/*.py") if p.name != "raw_data.py" and p.parent.name != "figure_benchmark"}
     assert scripts == {case.script for case in CASES}
     assert len(CASES) == len(scripts) == 29
     keys = [output_key(case, name) for case in CASES for name in case.outputs]

@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased — Research Figure Making v0.2
+
+- Add physical-size-aware `DesignTokens` and 89 mm / 178 mm presets.
+- Add an SVG-native `DiagramCanvas` for original mechanism and architecture diagrams.
+- Add `FigureComposer` for mixed SVG and Matplotlib multi-panel figures, including SVG ID namespacing.
+- Add validated SVG/PDF/PNG vector export through the optional CairoSVG extra.
+- Add SVG accessibility metadata, declared-font-size checks, contrast and grayscale-similarity diagnostics.
+- Add paired-seed, factorial-ablation, scaling-efficiency and qualitative/quantitative templates.
+- Add six original benchmark figures, including classic-paper-inspired visual grammars and a single-column size test.
+- Add PDF page-width/text-boundary/raster-proof review at 89 mm and 178 mm.
+- Add a paper figure atlas with original paper links and design lessons; no source artwork is redistributed.
+- Clarify that upstream wide canvases, large fonts and manually tightened axes are historical examples, not universal rules.
+
 ## Unreleased — Phase 5
 
 - Regenerate all 29 legacy plotting scripts without altering their source files.
