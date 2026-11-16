@@ -33,3 +33,20 @@ jobs:
           test "$(find /tmp/figure-generated -name '*.pdf' | wc -l)" -eq 4
           test "$(find /tmp/figure-generated -name '*.svg' | wc -l)" -eq 4
           test "$(find /tmp/figure-generated -name '*.manifest.json' | wc -l)" -eq 4
+      - name: Generate legacy case-study adapters for review
+        env:
+          MPLBACKEND: Agg
+        run: |
+          python examples/migrate_legacy.py --out /tmp/legacy-generated
+          test "$(find /tmp/legacy-generated -name '*.png' | wc -l)" -eq 3
+          test "$(find /tmp/legacy-generated -name '*.pdf' | wc -l)" -eq 3
+          test "$(find /tmp/legacy-generated -name '*.svg' | wc -l)" -eq 3
+      - name: Archive publication-format review figures
+        if: ${{ matrix.python-version == '3.12' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: figure-review-python312
+          path: |
+            /tmp/figure-generated/
+            /tmp/legacy-generated/
+          retention-days: 14
