@@ -26,3 +26,5 @@ examples/legacy-generated/
 templates/figures/
 .coverage
 htmlcov/
+
+/review/generated/

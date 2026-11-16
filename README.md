@@ -19,6 +19,21 @@ To adapt three original case studies without changing their files:
 These adapters reuse hard-coded values from the old Python scripts and do not
 independently verify their original experimental statistics.
 
+### Phase 5: full legacy replay and publication-width review
+
+    python -m pip install -e ".[dev,legacy]"
+    python tools/reproduce_legacy.py --baseline review/legacy-baseline.json
+    python examples/immunostruct_publication.py
+    python examples/macl_publication.py
+    python examples/rnagenscape_publication.py
+    python tools/review_publication_pdfs.py review/generated
+
+For historical PDF comparisons and the separate PDF review step, install Poppler
+(`pdftoppm` and `pdftotext`). Use Python 3.12 with
+`-c review/renderer-constraints.txt` for the reference renderer.
+See [the Phase 5 review](review/PHASE5.zh-CN.md) for all outputs, baseline
+differences and the distinction between rendering, layout and data validation.
+
 **The four new templates contain synthetic teaching values, not reported
 scientific measurements.** Their outputs include PNG, PDF, SVG and optional
 SHA256 provenance manifests.

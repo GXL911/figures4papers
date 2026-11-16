@@ -84,3 +84,16 @@ of a scientific experiment or of arbitrary data transformations.
 
 See figure-contract.md, statistical-visualization.md, data-provenance.md,
 figure-catalog.md, and the executable templates.
+
+## Physical width and metric-specific error bars
+
+Use `figures4papers.layout_review.review_layout(fig, width_mm=178)`. It
+reports text sizes, canvas overflows and bounding-box collision candidates from
+an Agg canvas. It is not a certificate for PDF/SVG, contrast or statistical
+correctness. Pair it with PDF rasterization and a visual check.
+
+Use `finalize_figure(..., crop=False)` to preserve the requested figure size
+instead of exporting with a tight bounding box. For a figure with more than one
+whisker convention, use `FigureContract(..., uncertainty_kind="mixed",
+uncertainty_by_metric={"AUROC": "sd", "AUPRC": "sd", "Mean PPVn": "sem"})`.
+Specify the convention in the displayed figure as well as the manifest.

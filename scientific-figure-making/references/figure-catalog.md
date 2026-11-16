@@ -1,6 +1,6 @@
 # Figure catalog — all upstream Python scripts
 
-Static review baseline 2026-11-16: commit 0ddfbd3fc989. The 30 Python
+Static review baseline 2026-11-16: commit 0ddfbd3fc989. The Phase 5 [replay and layout review](../../review/PHASE5.zh-CN.md) covers every plotting entry below. The 30 Python
 files include one raw_data.py and 29 plotting scripts. Upstream outputs
 are case-study references, **not certified by fork v0.1 tests**.
 

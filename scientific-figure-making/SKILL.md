@@ -27,8 +27,9 @@ their own implementations from the historical demonstrations.
 4. Generate through the figures4papers API with portable font fallbacks.
 5. Validate artist values and axes before export.
 6. Export PNG/PDF/SVG and SHA256 provenance manifest when sources exist.
-7. Visually inspect at publication size; investigate warnings instead of
-   changing measurements to make checks pass.
+7. Inspect the exported PDF at its intended physical width. Pair renderer text
+   diagnostics with a rasterized proof and human visual review; investigate
+   warnings instead of changing measurements to make checks pass.
 
 ### Commands
 
@@ -44,8 +45,12 @@ Read reference documents as needed:
 - references/figure-catalog.md: catalog of 30 legacy Python files.
 
 Restrictions: do not infer CI/SEM from arbitrary input, do not fill missing
-measurements with zero, and do not claim all upstream figures have been
-independently reproduced. No automatic test substitutes for source review.
+measurements with zero, or confuse plot replay with independent reproduction of
+the underlying experiments. No automatic test substitutes for source review.
+
+For legacy replay and publication QA, follow [the Phase 5 evidence guide](../review/PHASE5.zh-CN.md).
+Use the renderer baseline only for the portable figure path; do not bless a
+different source chart merely because it has a similar image signature.
 
 
 Open `references/` only as needed; do not preload every file. Start from the table below, then follow links inside the document you opened (and into `figure_*` code via [references/demos.md](references/demos.md)) instead of loading the full reference set up front.

@@ -31,10 +31,12 @@ def _check_export(path: Path) -> None:
 
 def finalize_figure(fig, out_path, formats=None, dpi: int = 300, close: bool = True,
                     pad: float = 0.06, *, contract: FigureContract | None = None,
-                    source_files=(), seed: int | None = None, transformations=()):
+                    source_files=(), seed: int | None = None, transformations=(),
+                    crop: bool = True):
     """Write each format; optionally emit a provenance manifest.
 
     Return paths to image files (manifest path is base.with_suffix('.manifest.json')).
+    Pass crop=False to preserve the canvas physical dimensions instead of tight cropping.
     Import Matplotlib with Agg backend for headless scripts before pyplot import.
     """
     import matplotlib.pyplot as plt
@@ -57,7 +59,7 @@ def finalize_figure(fig, out_path, formats=None, dpi: int = 300, close: bool = T
     try:
         for fmt in formats:
             path = base.with_suffix("." + fmt)
-            fig.savefig(path, format=fmt, dpi=dpi, bbox_inches="tight", pad_inches=pad)
+            fig.savefig(path, format=fmt, dpi=dpi, bbox_inches="tight" if crop else fig.bbox_inches, pad_inches=pad)
             _check_export(path)
             saved.append(path)
         if contract is not None:
