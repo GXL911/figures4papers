@@ -143,4 +143,5 @@ def validate_figure(fig, *, require_axis_labels: bool = True, bar_zero_warning: 
         if bar_zero_warning and any(isinstance(c, BarContainer) for c in ax.containers):
             if ax.get_ylim()[0] > 0:
                 issues.append(ValidationIssue("warning", "truncated_bar_axis", f"Panel {i} bar y-axis starts above zero; justify or revise."))
+    issues.extend(validate_color_semantics(fig))
     return issues
