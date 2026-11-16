@@ -97,7 +97,8 @@ def rnagenscape_heatmap_example(output_dir: Path):
         data.results_zebrafish_pct_pos,
         data.results_ribosome_pct_pos,
     ],axis=1)
-    names=data.options[:-1]  # the final label is a derived improvement row
+    names=[("RNAGenScape (ours)" if "RNAGenScape" in label else label)
+           for label in data.options[:-1]]  # plain text: legacy TeX commands require a full LaTeX install
     if len(names)!=values.shape[0]:
         raise ValueError("Legacy method labels mismatch their 13 rows.")
     apply_publication_style()

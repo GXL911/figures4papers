@@ -12,6 +12,13 @@ fork maintainer.
     python -m pytest -q
     python examples/run_all.py --out examples/generated
 
+To adapt three original case studies without changing their files:
+
+    python examples/migrate_legacy.py --out examples/legacy-generated
+
+These adapters reuse hard-coded values from the old Python scripts and do not
+independently verify their original experimental statistics.
+
 **The four new templates contain synthetic teaching values, not reported
 scientific measurements.** Their outputs include PNG, PDF, SVG and optional
 SHA256 provenance manifests.

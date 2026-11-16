@@ -41,6 +41,9 @@ Reusable design references: ImmunoStruct for multi-metric comparison;
 MACL for long-horizon learning/retention; RNAGenScape for annotated
 heatmaps; Dispersion and VIGIL for geometric explanatory figures.
 
+First isolated, non-destructive adapters now exist in examples/migrate_legacy.py.
+These are partial subsets, not pixel-perfect reproductions of original PDFs/PNGs.
+
 Migration order: ImmunoStruct -> MACL -> RNAGenScape, maintaining original
 script and artifact snapshots, tracing statistics, comparing actual plotted
 numbers, and reviewing rendered images at publication size.
