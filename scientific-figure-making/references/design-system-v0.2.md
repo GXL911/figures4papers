@@ -14,9 +14,9 @@ Use physical dimensions rather than designing at an arbitrary screen size and sh
 The presets provide convenient starting heights. Change the height to suit the visual grammar and content. Export without tight cropping (`crop=False`) when the requested physical canvas width is part of the publication contract.
 
 Recommended initial type scale at final size:
-- Main panel title: 8–9 pt.
-- Axis labels and legend: 7–8 pt.
-- Tick labels and dense annotations: 6–7 pt.
+- Main panel title: 9–10 pt.
+- Axis labels and legend: 8–9 pt.
+- Tick labels and dense annotations: 7–8 pt.
 - Panel labels: 8–9 pt, bold.
 - Below 6 pt: treat as a warning that needs explicit justification and manual review, not an automatic universal failure.
 

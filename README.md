@@ -62,6 +62,7 @@ independent reproduction of the underlying published experiments.
 
 Useful documentation:
 - `scientific-figure-making/SKILL.md`: agent workflow.
+- `scientific-figure-making/references/api.md`: installed Python API.
 - `scientific-figure-making/references/design-system-v0.2.md`: typography,
   physical dimensions, color semantics, statistical honesty and QA.
 - `scientific-figure-making/references/diagram-engine.md`: SVG diagram API.

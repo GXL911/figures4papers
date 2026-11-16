@@ -18,15 +18,15 @@ def build(output_dir: str | Path):
         [0.727, 0.759, 0.781, 0.792],
         [0.733, 0.766, 0.795, 0.814],
     ])
-    labels = ["None", "Crop", "Color", "Blur"]
+    levels = ["Off", "Weak", "Moderate", "Strong"]
     with publication_context():
         fig, ax = plt.subplots(figsize=(SINGLE_COLUMN.width_mm / 25.4, 89 / 25.4))
         image = ax.imshow(matrix, cmap="cividis", vmin=0.68, vmax=0.83, aspect="equal")
-        ax.set_xticks(np.arange(4), labels)
-        ax.set_yticks(np.arange(4), labels)
-        ax.set_xlabel("Second intervention")
-        ax.set_ylabel("First intervention")
-        ax.set_title("Ablation matrix", loc="left", pad=8, fontsize=9)
+        ax.set_xticks(np.arange(4), levels)
+        ax.set_yticks(np.arange(4), levels)
+        ax.set_xlabel("Color distortion strength")
+        ax.set_ylabel("Crop strength")
+        ax.set_title("Crop × color ablation", loc="left", pad=8, fontsize=9)
         for row in range(4):
             for col in range(4):
                 color = "white" if matrix[row, col] < 0.735 else "#17212B"
@@ -42,8 +42,8 @@ def build(output_dir: str | Path):
         contract = FigureContract(
             "v02-ablation-matrix", "heatmap", "Show main effects and pairwise intervention interactions",
             "Hard-coded synthetic teaching values; not reproduced SimCLR measurements",
-            "second intervention", "first intervention / synthetic accuracy",
-            provenance_note="Rows and columns are design factors; diagonal entries are single-factor conditions.",
+            "color distortion strength", "crop strength; color = synthetic accuracy",
+            provenance_note="Each cell is a crop-strength × color-distortion-strength combination; the upper-left cell is the no-augmentation control.",
         )
         paths = finalize_figure(fig, Path(output_dir) / "ablation_matrix",
                                 formats=("png", "pdf", "svg"), contract=contract, crop=False,

@@ -58,6 +58,7 @@ python tools/review_v02_figure_benchmark.py figure-benchmark/generated \
 
 ## References to load
 
+- `references/api.md`: installed package API and v0.2 entry points.
 - `references/design-system-v0.2.md`: physical dimensions, type, color, axes,
   statistical honesty and QA.
 - `references/diagram-engine.md`: SVG mechanism diagram API and limitations.
