@@ -26,6 +26,10 @@ def build_manifest(*, contract: FigureContract, source_files=(), output_files=()
     outputs = [{"path": str(p), "sha256": file_sha256(p)} for p in output_files]
     if any(not isinstance(s, str) or not s for s in transformations):
         raise ValueError("transformations must be explicit nonblank strings.")
+    try:
+        package_version = importlib.metadata.version("figures4papers")
+    except importlib.metadata.PackageNotFoundError:
+        package_version = "0.2.0"
     return {
         "schema_version": 1,
         "created_utc": datetime.now(timezone.utc).isoformat(),
@@ -37,6 +41,6 @@ def build_manifest(*, contract: FigureContract, source_files=(), output_files=()
         "versions": {
             "numpy": numpy.__version__,
             "matplotlib": matplotlib.__version__,
-            "figures4papers": "0.1.0",
+            "figures4papers": package_version,
         },
     }

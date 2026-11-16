@@ -19,7 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - name: Install package
-        run: python -m pip install -e ".[dev]"
+        run: python -m pip install -e ".[dev,illustration]"
       - name: Run validation tests
         env:
           MPLBACKEND: Agg
@@ -33,6 +33,15 @@ jobs:
           test "$(find /tmp/figure-generated -name '*.pdf' | wc -l)" -eq 4
           test "$(find /tmp/figure-generated -name '*.svg' | wc -l)" -eq 4
           test "$(find /tmp/figure-generated -name '*.manifest.json' | wc -l)" -eq 4
+      - name: Generate v0.2 publication figure benchmark
+        env:
+          MPLBACKEND: Agg
+        run: |
+          python -m figure_benchmark.run_all --out /tmp/figure-benchmark
+          test "$(find /tmp/figure-benchmark -name '*.png' | wc -l)" -eq 6
+          test "$(find /tmp/figure-benchmark -name '*.pdf' | wc -l)" -eq 6
+          test "$(find /tmp/figure-benchmark -name '*.svg' | wc -l)" -eq 6
+          test "$(find /tmp/figure-benchmark -name '*.manifest.json' | wc -l)" -eq 6
       - name: Generate legacy case-study adapters for review
         env:
           MPLBACKEND: Agg
@@ -44,7 +53,7 @@ jobs:
       - name: Install pinned portable renderer and PDF tools
         if: ${{ matrix.python-version == '3.12' }}
         run: |
-          python -m pip install -e ".[legacy]" -c review/renderer-constraints.txt
+          python -m pip install -e ".[legacy,illustration]" -c review/renderer-constraints.txt
           if ! command -v pdftoppm || ! command -v pdftotext; then
             sudo apt-get update
             sudo apt-get install -y poppler-utils
@@ -64,6 +73,9 @@ jobs:
           python examples/macl_publication.py --out /tmp/figure-phase5/macl
           python examples/rnagenscape_publication.py --out /tmp/figure-phase5/rnagenscape
           python tools/review_publication_pdfs.py /tmp/figure-phase5
+      - name: Review v0.2 benchmark PDFs at 89 mm and 178 mm
+        if: ${{ matrix.python-version == '3.12' }}
+        run: python tools/review_v02_figure_benchmark.py /tmp/figure-benchmark --review-out /tmp/figure-benchmark-review
       - name: Archive publication-format review figures
         if: ${{ matrix.python-version == '3.12' }}
         uses: actions/upload-artifact@v4
@@ -71,6 +83,8 @@ jobs:
           name: figure-review-python312
           path: |
             /tmp/figure-generated/
+            /tmp/figure-benchmark/
+            /tmp/figure-benchmark-review/
             /tmp/legacy-generated/
             /tmp/figure-phase5/
           retention-days: 14

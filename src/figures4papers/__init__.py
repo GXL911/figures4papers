@@ -18,5 +18,10 @@ from .figure_validation import (
     validate_color_semantics,
 )
 from .provenance import file_sha256, build_manifest
+from .design_tokens import (DesignTokens, FigurePreset, DEFAULT_TOKENS, SINGLE_COLUMN, DOUBLE_COLUMN, publication_context, rc_params)
+from .diagram import DiagramCanvas, DiagramNode
+from .composer import FigureComposer
+from .vector_export import export_svg
+from .visual_qa import audit_svg, audit_palette, contrast_ratio
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
