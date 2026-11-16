@@ -1,3 +1,58 @@
+# Fork development: Research Figure Making v0.1
+
+This GXL911 fork extends Chen Liu's figures4papers case-study repository with
+an installable plotting package, scientific validation, templates, and agent
+workflow documentation. Original figures and original README are preserved
+below. The original first-person biography refers to **Chen Liu**, not to the
+fork maintainer.
+
+## Quick start (Python >= 3.10)
+
+    python -m pip install -e ".[dev]"
+    python -m pytest -q
+    python examples/run_all.py --out examples/generated
+
+To adapt three original case studies without changing their files:
+
+    python examples/migrate_legacy.py --out examples/legacy-generated
+
+These adapters reuse hard-coded values from the old Python scripts and do not
+independently verify their original experimental statistics.
+
+### Phase 5: full legacy replay and publication-width review
+
+    python -m pip install -e ".[dev,legacy]"
+    python tools/reproduce_legacy.py --baseline review/legacy-baseline.json
+    python examples/immunostruct_publication.py
+    python examples/macl_publication.py
+    python examples/rnagenscape_publication.py
+    python tools/review_publication_pdfs.py review/generated
+
+For historical PDF comparisons and the separate PDF review step, install Poppler
+(`pdftoppm` and `pdftotext`). Use Python 3.12 with
+`-c review/renderer-constraints.txt` for the reference renderer.
+See [the Phase 5 review](review/PHASE5.zh-CN.md) for all outputs, baseline
+differences and the distinction between rendering, layout and data validation.
+
+**The four new templates contain synthetic teaching values, not reported
+scientific measurements.** Their outputs include PNG, PDF, SVG and optional
+SHA256 provenance manifests.
+
+New components:
+- src/figures4papers/: validated plotting, statistics, export and contracts.
+- templates/: grouped bars, learning curves, heatmap, reliability.
+- tests/: numerical, statistical, artist, export and example verification.
+- scientific-figure-making/SKILL.md: AI agent workflow.
+- scientific-figure-making/references/figure-catalog.md: all 30 Python scripts.
+- RESEARCH_PROJECT_REVIEW.zh-CN.md: baseline findings and limitations.
+
+The upstream LICENSE is CC BY-NC 4.0. This fork does not relicense original
+material. Commercial reuse of covered material requires appropriate permission.
+
+---
+
+## Upstream README (preserved)
+
 <div align="center">
 
 <h1><code>Figures for Papers</code></h1>

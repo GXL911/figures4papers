@@ -12,6 +12,47 @@ description: >-
 
 # Scientific figure making
 
+## Executable fork extension (v0.1)
+
+The fork includes a real installable Python package: src/figures4papers/.
+AI agents should **call its functions** rather than repeatedly inventing
+their own implementations from the historical demonstrations.
+
+### Mandatory workflow
+
+1. Figure Contract: claim, source, units, chart, and uncertainty meaning.
+2. Inspect source: reject NaN/Inf, unsupported shapes and undocumented statistics.
+3. Choose a template or refer to a legacy demonstration; never confuse
+   synthetic example values with actual research observations.
+4. Generate through the figures4papers API with portable font fallbacks.
+5. Validate artist values and axes before export.
+6. Export PNG/PDF/SVG and SHA256 provenance manifest when sources exist.
+7. Inspect the exported PDF at its intended physical width. Pair renderer text
+   diagnostics with a rasterized proof and human visual review; investigate
+   warnings instead of changing measurements to make checks pass.
+
+### Commands
+
+    python -m pip install -e ".[dev]"
+    python -m pytest -q
+    python examples/run_all.py --out examples/generated
+
+Read reference documents as needed:
+- references/api.md: implemented Python API.
+- references/figure-contract.md: scientific claim and units.
+- references/statistical-visualization.md: uncertainty and numeric checks.
+- references/data-provenance.md: SHA256 manifest and limitations.
+- references/figure-catalog.md: catalog of 30 legacy Python files.
+
+Restrictions: do not infer CI/SEM from arbitrary input, do not fill missing
+measurements with zero, or confuse plot replay with independent reproduction of
+the underlying experiments. No automatic test substitutes for source review.
+
+For legacy replay and publication QA, follow [the Phase 5 evidence guide](../review/PHASE5.zh-CN.md).
+Use the renderer baseline only for the portable figure path; do not bless a
+different source chart merely because it has a similar image signature.
+
+
 Open `references/` only as needed; do not preload every file. Start from the table below, then follow links inside the document you opened (and into `figure_*` code via [references/demos.md](references/demos.md)) instead of loading the full reference set up front.
 
 ## When to load this skill

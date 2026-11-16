@@ -1,0 +1,76 @@
+name: Scientific figure validation
+
+on:
+  push:
+    branches: ["feature/**", "main"]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install package
+        run: python -m pip install -e ".[dev]"
+      - name: Run validation tests
+        env:
+          MPLBACKEND: Agg
+        run: python -m pytest -q
+      - name: Generate all synthetic templates
+        env:
+          MPLBACKEND: Agg
+        run: |
+          python examples/run_all.py --out /tmp/figure-generated
+          test "$(find /tmp/figure-generated -name '*.png' | wc -l)" -eq 4
+          test "$(find /tmp/figure-generated -name '*.pdf' | wc -l)" -eq 4
+          test "$(find /tmp/figure-generated -name '*.svg' | wc -l)" -eq 4
+          test "$(find /tmp/figure-generated -name '*.manifest.json' | wc -l)" -eq 4
+      - name: Generate legacy case-study adapters for review
+        env:
+          MPLBACKEND: Agg
+        run: |
+          python examples/migrate_legacy.py --out /tmp/legacy-generated
+          test "$(find /tmp/legacy-generated -name '*.png' | wc -l)" -eq 3
+          test "$(find /tmp/legacy-generated -name '*.pdf' | wc -l)" -eq 3
+          test "$(find /tmp/legacy-generated -name '*.svg' | wc -l)" -eq 3
+      - name: Install pinned portable renderer and PDF tools
+        if: ${{ matrix.python-version == '3.12' }}
+        run: |
+          python -m pip install -e ".[legacy]" -c review/renderer-constraints.txt
+          if ! command -v pdftoppm || ! command -v pdftotext; then
+            sudo apt-get update
+            sudo apt-get install -y poppler-utils
+          fi
+      - name: Replay and regress all original scripts
+        if: ${{ matrix.python-version == '3.12' }}
+        env:
+          MPLBACKEND: Agg
+        run: |
+          python tools/reproduce_legacy.py --workers 2 --baseline review/legacy-baseline.json --out /tmp/figure-phase5/legacy
+      - name: Generate and verify seven publication-width adaptations
+        if: ${{ matrix.python-version == '3.12' }}
+        env:
+          MPLBACKEND: Agg
+        run: |
+          python examples/immunostruct_publication.py --out /tmp/figure-phase5/immunostruct
+          python examples/macl_publication.py --out /tmp/figure-phase5/macl
+          python examples/rnagenscape_publication.py --out /tmp/figure-phase5/rnagenscape
+          python tools/review_publication_pdfs.py /tmp/figure-phase5
+      - name: Archive publication-format review figures
+        if: ${{ matrix.python-version == '3.12' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: figure-review-python312
+          path: |
+            /tmp/figure-generated/
+            /tmp/legacy-generated/
+            /tmp/figure-phase5/
+          retention-days: 14

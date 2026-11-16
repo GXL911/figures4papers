@@ -1,6 +1,6 @@
 # Tutorials: End-to-End Publication Figures
 
-Implement the API described in [api.md](api.md) in your own code (constants, style, plot helpers, finalize). This repository does not currently ship a tracked shared Python module that defines `apply_publication_style`, `make_grouped_bar`, or the other helpers directly; their signatures and behavior are specified in [api.md](api.md) and should be implemented or adapted per project. For real-world scripts that follow this style, see [demos.md](demos.md) (links to the [figures4papers](https://github.com/ChenLiu-1996/figures4papers) `figure_*` folders).
+Implement the API described in [api.md](api.md) in your own code (constants, style, plot helpers, finalize). This fork now ships a real importable implementation in src/figures4papers. Use that package directly; reference the revised API specification in api.md. For real-world scripts that follow this style, see [demos.md](demos.md) (links to the [figures4papers](https://github.com/ChenLiu-1996/figures4papers) `figure_*` folders).
 
 If venue, approximate dimensions, or export formats are missing and they would change layout or DPI, ask before locking choices. For unattended scripts, set a non-interactive matplotlib backend (for example `matplotlib.use("Agg")`) before importing `pyplot`. Finish with `finalize_figure` as in [api.md](api.md).
 

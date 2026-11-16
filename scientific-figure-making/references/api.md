@@ -1,152 +1,99 @@
-# API Reference
+# Executable Figure Making API — Fork v0.1
 
-This document specifies the conventions, constants, and function signatures that implementations should follow for publication-style figures. Implement these in your own code or adapt from the [figure_* demos](demos.md).
+This fork supplies a real Python implementation in src/figures4papers;
+the upstream reference originally described functions to implement.
+The original figure_* scripts are preserved and are not yet migrated.
 
----
+## Install and execute
 
-## Constants
+    python -m pip install -e ".[dev]"
+    python -m pytest -q
+    python examples/run_all.py --out examples/generated
 
-### PALETTE
+Import from figures4papers. See templates/ for complete, executable examples.
 
-Semantic color map for publication figures.
+## Publication style
 
-```python
-PALETTE = {
-    "blue_main": "#0F4D92",
-    "blue_secondary": "#3775BA",
-    "green_1": "#DDF3DE", "green_2": "#AADCA9", "green_3": "#8BCF8B",
-    "red_1": "#F6CFCB", "red_2": "#E9A6A1", "red_strong": "#B64342",
-    "neutral": "#CFCECE", "highlight": "#FFD700",
-    "teal": "#42949E", "violet": "#9A4D8E",
-}
-```
+- FigureStyle(font_size=11, axes_linewidth=1.2, use_tex=False)
+- apply_publication_style(style=None): configure Matplotlib rcParams.
+- create_subplots(nrows=1,ncols=1,figsize=None,**kwargs): (fig, flat_axes).
+- PALETTE and DEFAULT_COLORS: original figure blue/green/red colors.
 
-Use blues for key/proposed methods, greens for improvements, reds for baselines/contrasts, neutral for background.
+Defaults avoid LaTeX and prefer portable sans-serif fallback. Final font
+size must be evaluated at the paper's actual physical dimensions.
 
-### DEFAULT_COLORS
+## Plot primitives
 
-Ordered list of colors used when `colors` is not passed to plot helpers: `[blue_main, green_3, red_strong, teal, violet, neutral]`.
+- make_grouped_bar(ax, categories, series, labels, ylabel='Value',
+  colors=None, annotate=False, *, yerr=None, uncertainty_kind=None)
+  Series shape: (n_methods,n_categories). Returns a list of BarContainers,
+  one per method. With yerr you MUST specify sd/sem/ci/bootstrap_ci/bounds.
+  CI yerr denotes nonnegative half-width around the shown point estimate.
+- annotate_bars(ax, bars, fmt='{:.2f}', fontsize=9, padding=3).
+- make_learning_curves(ax,x,means,labels,*,lower=None,upper=None,
+  uncertainty_kind=None, colors=None, xlabel='Step', ylabel='Metric').
+  All curves have shape (n_methods,n_steps). Shaded bands require actual
+  supplied bounds; the function never guesses a standard deviation.
+- make_trend(ax,x,y_series,labels,...,show_shadow=False,*,lower=None,
+  upper=None,uncertainty_kind=None): thin learning-curves wrapper.
+  show_shadow=True without explicit bounds fails.
+- make_heatmap(ax,matrix,x_labels=None,y_labels=None,cmap='viridis',
+  cbar_label=None,annotate=False,*,allow_nan=False,vmin=None,vmax=None).
+  Missing cells require allow_nan=True.
+- make_scatter(ax,x,y,label=None,color=None,size=50,alpha=0.7).
+- make_sphere_illustration(ax,light_dir=(-0.5,0.5,0.8),resolution=128,
+  alpha=0.6): illustrative shading; not measured 3D geometry.
+- make_reliability_diagram(ax,nominal,empirical,*,lower=None,upper=None,
+  uncertainty_kind=None,label='Empirical coverage',color=None).
+  Both arrays in [0,1], nominal strictly ascending. Coverage CIs must
+  be explicitly provided, with a declared kind.
 
----
+## Statistical summaries
 
-## FigureStyle
+Use UncertaintySpec(kind='ci',confidence_level=0.95) with
+summarize_seeds(samples,spec,axis=0). The return value contains mean,
+lower, upper, n, kind and confidence_level.
 
-```python
-@dataclass(frozen=True)
-class FigureStyle:
-    font_size: int = 16
-    axes_linewidth: float = 2.5
-    use_tex: bool = False
-    font_family: tuple[str, ...] = ("DejaVu Sans", "Helvetica", "Arial", "sans-serif")
-```
+Available kinds: none, sd, sem, ci (Student-t), bootstrap_ci (seeded
+percentile bootstrap). ONLY independent replicate axes are supported.
+For time-series observations use separately justified dependence-aware
+block/hierarchical resampling.
 
-- **font_size:** Base font size (use 24 for large bar panels, 15-16 for compact plots).
-- **axes_linewidth:** Spine width (3 for big bars, 2 for compact).
-- **use_tex:** Set `True` only when LaTeX is installed and math labels are required.
-- **font_family:** Fallback list for sans-serif fonts.
+## Validation and provenance
 
----
+- validate_numeric_array(data,ndim=None,name='data',allow_nan=False)
+- validate_grouped_inputs(categories,series,labels,yerr=None,uncertainty_kind=None)
+- validate_intervals(mean,lower,upper)
+- validate_reliability(nominal,empirical)
+- validate_bar_artists(container,expected): check Matplotlib bar heights.
+- validate_line_artist(line,x,y): check plotted x/y arrays.
+- validate_color_semantics(fig): warn when a series changes colors across panels.
+- validate_figure(fig): report warning diagnostics about axis labels,
+  truncated bar axes and invalid limits. Manual visual review is required.
 
-## Style and Layout
+The FigureContract dataclass declares figure_id, chart_type, takeaway,
+source_description, x_unit, y_unit, uncertainty_kind and provenance_note.
 
-### apply_publication_style(style=None)
+finalize_figure(fig,out_path,formats=('png','pdf','svg'),dpi=300,
+close=True,pad=0.06,contract=None,source_files=(),seed=None,
+transformations=()) checks file integrity and optionally writes a
+filename.manifest.json with SHA256 hashes of sources and outputs.
 
-Configures matplotlib rcParams: spines (top/right off), frameless legend, font family/size, vector export options. Call once before creating figures.
+Be honest: a SHA256 hash establishes file identity, not the correctness
+of a scientific experiment or of arbitrary data transformations.
 
-```python
-apply_publication_style(FigureStyle(font_size=24, axes_linewidth=3))
-```
+See figure-contract.md, statistical-visualization.md, data-provenance.md,
+figure-catalog.md, and the executable templates.
 
-### create_subplots(nrows=1, ncols=1, figsize=None, **kwargs)
+## Physical width and metric-specific error bars
 
-Returns `(fig, axes)` with `axes` a flattened 1D array of Axes. Pass `figsize=(width, height)` in inches.
+Use `figures4papers.layout_review.review_layout(fig, width_mm=178)`. It
+reports text sizes, canvas overflows and bounding-box collision candidates from
+an Agg canvas. It is not a certificate for PDF/SVG, contrast or statistical
+correctness. Pair it with PDF rasterization and a visual check.
 
-```python
-fig, axes = create_subplots(2, 2, figsize=(12, 8))
-```
-
-### finalize_figure(fig, out_path, formats=None, dpi=300, close=True, pad=0.05, **kwargs)
-
-Saves the figure to one or more formats (e.g. `['png', 'pdf']`). If `formats` is None, uses extension of `out_path` or defaults to pdf/svg/eps. Creates parent directories. Returns list of saved `Path`s.
-
-```python
-finalize_figure(fig, "output/result", formats=["png", "pdf"], dpi=300, pad=0.06)
-```
-
----
-
-## Plot Helpers
-
-### make_grouped_bar(ax, categories, series, labels, ylabel='Value', colors=None, annotate=False)
-
-Renders grouped bars. `categories`: list of x labels; `series`: list of arrays (one per group), same length as categories; `labels`: legend labels. Returns the last `BarContainer` (for use with `annotate_bars`).
-
-```python
-make_grouped_bar(ax, ["A", "B", "C"], [[1,2,3], [2,1,2]], ["X", "Y"], ylabel="Score", annotate=True)
-```
-
-### annotate_bars(ax, bars, fmt='{:.2f}', fontsize=10, padding=3)
-
-Adds text above each bar in a `BarContainer`.
-
-```python
-bars = make_grouped_bar(ax, cats, series, labels, annotate=False)
-annotate_bars(ax, bars, fmt="{:.1f}", fontsize=12)
-```
-
-### make_trend(ax, x, y_series, labels, colors=None, ylabel=None, xlabel=None, show_shadow=True)
-
-Plots multiple lines with optional uncertainty band. `y_series`: list of 1D arrays (same length as `x`).
-
-```python
-make_trend(ax, epochs, [acc_a, acc_b], ["Model A", "Model B"], ylabel="Accuracy", show_shadow=True)
-```
-
-### make_heatmap(ax, matrix, x_labels=None, y_labels=None, cmap='magma', cbar_label=None, annotate=False)
-
-Renders a 2D heatmap. Optionally adds colorbar label and cell annotations.
-
-```python
-make_heatmap(ax, corr_matrix, x_labels=names, y_labels=names, cbar_label="Correlation")
-```
-
-### make_scatter(ax, x, y, label=None, color=None, size=50, alpha=0.7)
-
-Single-series scatter. `x`, `y` must be same-length 1D arrays.
-
-```python
-make_scatter(ax, x_vals, y_vals, label="Samples", color=PALETTE["blue_main"])
-```
-
-### make_sphere_illustration(ax, light_dir=(-0.5, 0.5, 0.8), resolution=128, alpha=0.6)
-
-Draws a shaded 2D disk to mimic a 3D sphere. Use for conceptual diagrams.
-
-```python
-make_sphere_illustration(ax, light_dir=(-0.55, 0.65, 0.55), resolution=280)
-```
-
----
-
-## Validation Rules
-
-- All numeric sequences are converted to numpy arrays; 1D/2D and length checks are enforced.
-- `make_grouped_bar`: `len(categories)` must equal number of columns in `series`.
-- `make_trend`: each series must have same length as `x`.
-- `finalize_figure`: supported formats are pdf, svg, eps, png, jpg, jpeg, tif, tiff.
-
-See [design-theory.md](design-theory.md) for visual and export conventions.
-
-## Conventions
-
-- Save script outputs under a project `figures/` directory (or the path the user gives) with stable basenames; `finalize_figure` creates parent directories as needed.
-- In batch or headless runs, set a non-interactive backend before `import matplotlib.pyplot` (for example `matplotlib.use("Agg")`).
-- When comparisons, panel count, color roles, resolution, or data layout are underspecified in a way that would change the figure, confirm with the user before finalizing.
-
-## Related files
-
-- [SKILL.md](../SKILL.md) — When to load this skill
-- [demos.md](demos.md) — Canonical `figure_*` repo links
-- [common-patterns.md](common-patterns.md) — Layout, legend panel, print-safe encoding
-- [design-theory.md](design-theory.md) — Rationale and rcParams-style presets
-- [tutorials.md](tutorials.md) — End-to-end examples and pointers beyond the three core tutorials
+Use `finalize_figure(..., crop=False)` to preserve the requested figure size
+instead of exporting with a tight bounding box. For a figure with more than one
+whisker convention, use `FigureContract(..., uncertainty_kind="mixed",
+uncertainty_by_metric={"AUROC": "sd", "AUPRC": "sd", "Mean PPVn": "sem"})`.
+Specify the convention in the displayed figure as well as the manifest.
