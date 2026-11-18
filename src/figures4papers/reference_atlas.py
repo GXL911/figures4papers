@@ -110,7 +110,7 @@ class FigureRecord:
     layout_patterns: tuple[str, ...]
     scientific_intents: tuple[str, ...]
     evidence_types: tuple[str, ...]
-    domains: tuple[str, ...>
+    domains: tuple[str, ...]
     methods: tuple[str, ...]
     tasks: tuple[str, ...]
     panel_count: int
