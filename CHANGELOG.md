@@ -1,10 +1,21 @@
 # Changelog
 
+## Unreleased — Research Figure Making v0.3 foundations
+
+- Add a metadata-first Paper Figure Atlas with 16 provisional figure references from 16 papers; no third-party figure binaries are redistributed.
+- Separate scientific intent, figure role, visual form, layout pattern and evidence type in a versioned taxonomy.
+- Add fielded BM25 retrieval, hard metadata filters, soft structural ranking and Reciprocal Rank Fusion.
+- Add an optional semantic-score hook without bundling a large CLIP runtime or model weights.
+- Add an eight-query hand-curated retrieval development set and MRR, Recall@k and nDCG@k evaluation utilities.
+- Add JSON Schemas and runtime validators for Scientific Figure Design Briefs and Scene Graphs.
+- Add deterministic SVG rendering for manually positioned box/circle scenes and editable draw.io XML export.
+- Add architecture and research-source documentation; clarify that ELK layout, CLIP runtime, PPTX export and full visual QA remain future work.
+
 ## Unreleased — Research Figure Making v0.2
 
-- Add physical-size-aware `DesignTokens` and 89 mm / 178 mm presets.
-- Add an SVG-native `DiagramCanvas` for original mechanism and architecture diagrams.
-- Add `FigureComposer` for mixed SVG and Matplotlib multi-panel figures, including SVG ID namespacing.
+- Add physical-size-aware DesignTokens and 89 mm / 178 mm presets.
+- Add an SVG-native DiagramCanvas for original mechanism and architecture diagrams.
+- Add FigureComposer for mixed SVG and Matplotlib multi-panel figures, including SVG ID namespacing.
 - Add validated SVG/PDF/PNG vector export through the optional CairoSVG extra.
 - Add SVG accessibility metadata, declared-font-size checks, contrast and grayscale-similarity diagnostics.
 - Add paired-seed, factorial-ablation, scaling-efficiency and qualitative/quantitative templates.
@@ -21,6 +32,7 @@
 - Add 178 mm PDF width checks and seven case-study adaptations for review.
 - Record metric-specific SD/SEM for published ImmunoStruct figure panels.
 - Preserve reported MACL cohort sizes and plot RNAGenScape aggregate tables with explicit shared scales.
+- Original paper plotting scripts and image outputs were not modified.
 
 ## 0.1.0 (feature branch, not released)
 
