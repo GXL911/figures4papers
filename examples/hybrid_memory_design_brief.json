@@ -77,5 +77,37 @@
   "known_limitations": [
     "This is a conceptual architecture specification, not an empirical result.",
     "The exact fusion operator and predictive head are intentionally abstracted."
+  ],
+  "required_relations": [
+    {
+      "source_block_id": "input",
+      "target_block_id": "local_fir",
+      "relation_type": "data_flow",
+      "must_be_direct": true
+    },
+    {
+      "source_block_id": "input",
+      "target_block_id": "global_ssm",
+      "relation_type": "data_flow",
+      "must_be_direct": true
+    },
+    {
+      "source_block_id": "local_fir",
+      "target_block_id": "fusion",
+      "relation_type": "data_flow",
+      "must_be_direct": true
+    },
+    {
+      "source_block_id": "global_ssm",
+      "target_block_id": "fusion",
+      "relation_type": "data_flow",
+      "must_be_direct": true
+    },
+    {
+      "source_block_id": "fusion",
+      "target_block_id": "output",
+      "relation_type": "data_flow",
+      "must_be_direct": true
+    }
   ]
 }

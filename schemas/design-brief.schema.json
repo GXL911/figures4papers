@@ -99,6 +99,13 @@
     },
     "notes": {
       "type": "string"
+    },
+    "required_relations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/relation"
+      },
+      "default": []
     }
   },
   "$defs": {
@@ -184,6 +191,39 @@
         "reason_for_use": {
           "type": "string",
           "minLength": 1
+        }
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_block_id",
+        "target_block_id",
+        "relation_type"
+      ],
+      "properties": {
+        "source_block_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_block_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relation_type": {
+          "enum": [
+            "data_flow",
+            "control_flow",
+            "skip",
+            "attention",
+            "feedback",
+            "other"
+          ]
+        },
+        "must_be_direct": {
+          "type": "boolean",
+          "default": true
         }
       }
     }

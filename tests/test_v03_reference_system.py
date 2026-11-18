@@ -213,3 +213,7 @@ def test_about_conv_design_brief_and_scene_are_semantically_linked():
     scene["nodes"][1]["content_block_id"] = "not-in-the-brief"
     with pytest.raises(DesignContractError):
         validate_scene_against_brief(brief, scene)
+    scene = json.loads((ROOT / "examples" / "hybrid_memory_scene.json").read_text(encoding="utf-8"))
+    scene["edges"] = scene["edges"][:-1]
+    with pytest.raises(DesignContractError):
+        validate_scene_against_brief(brief, scene)

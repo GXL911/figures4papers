@@ -69,6 +69,23 @@ def validate_design_brief(brief: Mapping[str, Any]) -> dict[str, Any]:
         _text(reference.get("reason_for_use"), "references[].reason_for_use")
     if not isinstance(brief.get("constraints", {}), dict):
         raise DesignContractError("constraints must be an object.")
+    relations = brief.get("required_relations", [])
+    if not isinstance(relations, list):
+        raise DesignContractError("required_relations must be a list.")
+    for relation in relations:
+        if not isinstance(relation, Mapping):
+            raise DesignContractError("Each required relation must be an object.")
+        source_id = _text(relation.get("source_block_id"), "required_relations[].source_block_id")
+        target_id = _text(relation.get("target_block_id"), "required_relations[].target_block_id")
+        relation_type = _text(relation.get("relation_type"), "required_relations[].relation_type")
+        if source_id not in block_ids or target_id not in block_ids:
+            raise DesignContractError("Required relations must refer to known content blocks.")
+        if source_id == target_id:
+            raise DesignContractError("Required relations cannot connect a content block to itself.")
+        if relation_type not in {"data_flow", "control_flow", "skip", "attention", "feedback", "other"}:
+            raise DesignContractError(f"Unsupported required relation type: {relation_type}")
+        if "must_be_direct" in relation and not isinstance(relation["must_be_direct"], bool):
+            raise DesignContractError("required_relations[].must_be_direct must be boolean.")
     return dict(brief)
 
 def validate_scene(scene: Mapping[str, Any]) -> dict[str, Any]:
@@ -171,6 +188,37 @@ def validate_scene_against_brief(brief: Mapping[str, Any], scene: Mapping[str, A
         missing = set(panel.get("content_block_ids", [])) - mapped[panel_id]
         if missing:
             raise DesignContractError(f"Panel {panel_id} is missing scene nodes for content blocks: {sorted(missing)}")
+    nodes_by_id = {node["id"]: node for node in scene["nodes"]}
+    block_nodes: dict[str, set[str]] = {}
+    for node in scene["nodes"]:
+        if node.get("content_block_id"):
+            block_nodes.setdefault(node["content_block_id"], set()).add(node["id"])
+    direct_relations = set()
+    adjacency: dict[str, set[str]] = {}
+    for edge in scene.get("edges", []):
+        source_block = nodes_by_id[edge["source"]].get("content_block_id")
+        target_block = nodes_by_id[edge["target"]].get("content_block_id")
+        if source_block and target_block:
+            direct_relations.add((source_block, target_block, edge.get("kind", "other")))
+            adjacency.setdefault(source_block, set()).add(target_block)
+    for relation in brief.get("required_relations", []):
+        source_id = relation["source_block_id"]
+        target_id = relation["target_block_id"]
+        relation_type = relation["relation_type"]
+        if relation.get("must_be_direct", True):
+            matched = (source_id, target_id, relation_type) in direct_relations
+        else:
+            frontier, visited = [source_id], {source_id}
+            while frontier and target_id not in visited:
+                current = frontier.pop(0)
+                for neighbor in adjacency.get(current, set()) - visited:
+                    visited.add(neighbor)
+                    frontier.append(neighbor)
+            matched = target_id in visited
+        if not matched:
+            raise DesignContractError(
+                f"Scene Graph does not preserve required relation: {source_id} -[{relation_type}]-> {target_id}."
+            )
     return dict(scene)
 
 
