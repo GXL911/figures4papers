@@ -66,6 +66,16 @@ def test_fielded_bm25_finds_selective_ssm_reference():
     assert hits[0].lexical_score > 0
 
 
+def test_evidence_type_is_an_independent_retrieval_facet():
+    hits = load_atlas().search(
+        "nominal empirical coverage calibration uncertainty",
+        filters={"evidence_types": ["calibration"]},
+        facets={"evidence_types": ["reliability", "uncertainty"]},
+        limit=5,
+    )
+    assert {hit.figure.figure_id for hit in hits} == {"guo-2017-fig1", "kuleshov-2018-fig1"}
+
+
 def test_hard_filter_and_soft_structural_ranking():
     atlas = load_atlas()
     hits = atlas.search(

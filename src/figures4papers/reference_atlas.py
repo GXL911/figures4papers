@@ -109,7 +109,8 @@ class FigureRecord:
     visual_form: str
     layout_patterns: tuple[str, ...]
     scientific_intents: tuple[str, ...]
-    domains: tuple[str, ...]
+    evidence_types: tuple[str, ...]
+    domains: tuple[str, ...>
     methods: tuple[str, ...]
     tasks: tuple[str, ...]
     panel_count: int
@@ -152,6 +153,7 @@ class FigureRecord:
             visual_form=_required_text(data, "visual_form"),
             layout_patterns=_text_list(data, "layout_patterns", required=True),
             scientific_intents=_text_list(data, "scientific_intents", required=True),
+            evidence_types=_text_list(data, "evidence_types"),
             domains=_text_list(data, "domains"),
             methods=_text_list(data, "methods"),
             tasks=_text_list(data, "tasks"),
@@ -334,7 +336,7 @@ class ReferenceAtlas:
             "caption": figure.caption,
             "summary": figure.summary,
             "keywords": " ".join(
-                figure.scientific_intents + figure.domains + figure.methods + figure.tasks
+                figure.scientific_intents + figure.evidence_types + figure.domains + figure.methods + figure.tasks
             ),
             "figure_role": figure.figure_role,
             "visual_form": figure.visual_form,
@@ -358,6 +360,7 @@ class ReferenceAtlas:
             "visual_form": {figure.visual_form.casefold()},
             "layout_patterns": {item.casefold() for item in figure.layout_patterns},
             "scientific_intents": {item.casefold() for item in figure.scientific_intents},
+            "evidence_types": {item.casefold() for item in figure.evidence_types},
             "domains": {item.casefold() for item in figure.domains},
             "methods": {item.casefold() for item in figure.methods},
             "tasks": {item.casefold() for item in figure.tasks},
@@ -381,13 +384,14 @@ class ReferenceAtlas:
             "visual_form": {figure.visual_form.casefold()},
             "layout_patterns": {item.casefold() for item in figure.layout_patterns},
             "scientific_intents": {item.casefold() for item in figure.scientific_intents},
+            "evidence_types": {item.casefold() for item in figure.evidence_types},
             "domains": {item.casefold() for item in figure.domains},
             "methods": {item.casefold() for item in figure.methods},
             "tasks": {item.casefold() for item in figure.tasks},
         }
         weights = {
             "figure_role": 3.0, "visual_form": 2.5, "layout_patterns": 2.0,
-            "scientific_intents": 1.8, "domains": 1.2, "methods": 1.2, "tasks": 1.0,
+            "scientific_intents": 1.8, "evidence_types": 0.9, "domains": 1.2, "methods": 1.2, "tasks": 1.0,
         }
         score = 0.0
         for key, value in facets.items():
