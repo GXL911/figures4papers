@@ -79,12 +79,15 @@ def evaluate_queries(
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Evaluate reference-atlas retrieval against hand-curated qrels.")
     parser.add_argument("--atlas", type=Path, default=_default_atlas_dir())
-    parser.add_argument("--queries", type=Path, default=Path("data/reference-atlas/queries.json"))
+    parser.add_argument("--queries", type=Path, default=None)
     parser.add_argument("--k", type=int, default=5)
     parser.add_argument("--out", type=Path)
     args = parser.parse_args(argv)
     atlas = ReferenceAtlas.from_directory(args.atlas)
-    queries = json.loads(args.queries.read_text(encoding="utf-8"))
+    queries_path = args.queries if args.queries is not None else args.atlas / "queries.json"
+    if not queries_path.is_file():
+        raise FileNotFoundError(f"Benchmark queries not found: {queries_path}")
+    queries = json.loads(queries_path.read_text(encoding="utf-8"))
     report = evaluate_queries(atlas, queries, k=args.k)
     rendered = json.dumps(report, ensure_ascii=False, indent=2)
     if args.out:

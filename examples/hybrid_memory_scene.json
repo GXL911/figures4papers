@@ -10,7 +10,8 @@
   },
   "layout": {
     "mode": "manual",
-    "engine": "manual"
+    "engine": "manual",
+    "direction": "LR"
   },
   "nodes": [
     {

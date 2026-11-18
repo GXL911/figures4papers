@@ -6,6 +6,7 @@ import importlib.metadata
 from pathlib import Path
 
 from .figure_contract import FigureContract
+from ._version import __version__ as SOURCE_VERSION
 
 def file_sha256(path: str | Path) -> str:
     p = Path(path)
@@ -18,7 +19,7 @@ def file_sha256(path: str | Path) -> str:
     return h.hexdigest()
 
 def build_manifest(*, contract: FigureContract, source_files=(), output_files=(),
-                   seed: int | None = None, transformations=()) -> dict:
+                   seed: int | None = None, transformations=(), metadata=None) -> dict:
     """Record evidence; SHA verifies file identity, not scientific correctness."""
     import matplotlib
     import numpy
@@ -29,7 +30,7 @@ def build_manifest(*, contract: FigureContract, source_files=(), output_files=()
     try:
         package_version = importlib.metadata.version("figures4papers")
     except importlib.metadata.PackageNotFoundError:
-        package_version = "0.2.0"
+        package_version = SOURCE_VERSION
     return {
         "schema_version": 1,
         "created_utc": datetime.now(timezone.utc).isoformat(),
@@ -38,6 +39,7 @@ def build_manifest(*, contract: FigureContract, source_files=(), output_files=()
         "outputs": outputs,
         "transformations": list(transformations),
         "random_seed": seed,
+        "metadata": dict(metadata or {}),
         "versions": {
             "numpy": numpy.__version__,
             "matplotlib": matplotlib.__version__,

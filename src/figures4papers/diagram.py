@@ -145,7 +145,8 @@ class DiagramCanvas:
 
     def add_arrow(self, start: tuple[float, float], end: tuple[float, float], *,
                   label: str = "", color: str | None = None, width_pt: float = 1.1,
-                  element_id: str | None = None, dashed: bool = False) -> None:
+                  element_id: str | None = None, dashed: bool = False,
+                  label_font_size_pt: float = 6.5) -> None:
         x1, y1 = (_num(v, "start coordinate") for v in start)
         x2, y2 = (_num(v, "end coordinate") for v in end)
         self._inside(x1, y1); self._inside(x2, y2)
@@ -160,19 +161,76 @@ class DiagramCanvas:
             f'stroke="{color}" stroke-width="{width_pt * 25.4 / 72:g}" marker-end="url(#arrowhead)"{dash}/>'
         )
         if label:
+            label_font_size_pt = _num(label_font_size_pt, "label_font_size_pt")
+            if label_font_size_pt <= 0:
+                raise ValueError("Arrow label font size must be positive.")
             self._arrow_count += 1
             label_id = (element_id or f"arrow-{self._arrow_count}") + "-label"
             self.add_text(label_id, (x1+x2)/2,
-                          (y1+y2)/2 - 1.2, label, font_size_pt=6.5,
+                          (y1+y2)/2 - 1.2, label, font_size_pt=label_font_size_pt,
                           color=color, anchor="middle")
+
+    def add_routed_arrow(self, points: list[tuple[float, float]], *,
+                         label: str = "", color: str | None = None,
+                         width_pt: float = 1.1, element_id: str | None = None,
+                         dashed: bool = False, label_font_size_pt: float = 6.5) -> None:
+        """Draw an arrow along an explicit polyline route."""
+        if len(points) < 2:
+            raise ValueError("A routed arrow needs at least two points.")
+        normalized = [(_num(x, "route x"), _num(y, "route y")) for x, y in points]
+        for x, y in normalized:
+            self._inside(x, y)
+        width_pt = _num(width_pt, "width_pt")
+        if width_pt <= 0:
+            raise ValueError("Arrow width must be positive.")
+        color = _color(color or self.tokens.foreground)
+        eid = f' id="{self._claim_id(element_id)}"' if element_id else ""
+        dash = ' stroke-dasharray="2,1.5"' if dashed else ""
+        path = " ".join(
+            ("M" if index == 0 else "L") + f" {x:g},{y:g}"
+            for index, (x, y) in enumerate(normalized)
+        )
+        self._elements.append(
+            f'<path{eid} d="{path}" fill="none" stroke="{color}" '
+            f'stroke-width="{width_pt * 25.4 / 72:g}" '
+            f'marker-end="url(#arrowhead)"{dash}/>'
+        )
+        if label:
+            segment_lengths = [
+                math.hypot(normalized[i + 1][0] - normalized[i][0],
+                           normalized[i + 1][1] - normalized[i][1])
+                for i in range(len(normalized) - 1)
+            ]
+            total = sum(segment_lengths)
+            halfway = total / 2
+            for index, length in enumerate(segment_lengths):
+                if halfway <= length or index == len(segment_lengths) - 1:
+                    fraction = 0.5 if length == 0 else halfway / length
+                    x1, y1 = normalized[index]
+                    x2, y2 = normalized[index + 1]
+                    self._arrow_count += 1
+                    label_id = (element_id or f"arrow-{self._arrow_count}") + "-label"
+                    self.add_text(
+                        label_id,
+                        x1 + (x2 - x1) * fraction,
+                        y1 + (y2 - y1) * fraction - 1.2,
+                        label,
+                        font_size_pt=label_font_size_pt,
+                        color=color,
+                        anchor="middle",
+                    )
+                    break
+                halfway -= length
 
     def add_circle(self, element_id: str, cx: float, cy: float, radius: float, *,
                    fill: str = "#FFFFFF", stroke: str | None = None,
-                   stroke_width_pt: float = 0.8, label: str = "") -> None:
+                   stroke_width_pt: float = 0.8, label: str = "",
+                   font_size_pt: float = 9.0) -> None:
         cx, cy, radius = _num(cx, "cx"), _num(cy, "cy"), _num(radius, "radius")
         self._inside(cx, cy)
         stroke_width_pt = _num(stroke_width_pt, "stroke_width_pt")
-        if stroke_width_pt <= 0:
+        font_size_pt = _num(font_size_pt, "font_size_pt")
+        if stroke_width_pt <= 0 or font_size_pt <= 0:
             raise ValueError("Circle stroke width must be positive.")
         if radius <= 0 or cx-radius < 0 or cy-radius < 0 or cx+radius > self.width_mm or cy+radius > self.height_mm:
             raise ValueError("Circle must fit inside the canvas.")
@@ -184,7 +242,7 @@ class DiagramCanvas:
         )
         if label:
             self.add_text(element_id + "-label", cx, cy + 1.0, label,
-                          font_size_pt=9.0, anchor="middle")
+                          font_size_pt=font_size_pt, anchor="middle")
 
     def to_svg(self) -> str:
         desc = f'<desc>{escape(str(self.description))}</desc>' if self.description else ""

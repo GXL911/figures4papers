@@ -85,7 +85,12 @@ def audit_svg(svg: str, *, min_font_pt: float = 6.0) -> dict:
                     if match:
                         value = float(match.group(1))
                         unit = match.group(2) or "px"
-                        text_sizes.append(value * 72 / 25.4 if unit == "mm" else value)
+                        if unit == "mm":
+                            text_sizes.append(value * 72 / 25.4)
+                        elif unit == "px" or unit is None:
+                            text_sizes.append(value * 72 / 96)
+                        else:
+                            text_sizes.append(value)
     has_title = any(element.tag.endswith("title") and (element.text or "").strip() for element in root.iter())
     has_viewbox = bool(root.attrib.get("viewBox"))
     issues = []
@@ -107,4 +112,35 @@ def audit_svg(svg: str, *, min_font_pt: float = 6.0) -> dict:
         "small_text_count": sum(size < min_font_pt for size in text_sizes),
         "issues": issues,
         "limitations": "Sizes are estimated from declared SVG units and may not reflect arbitrary nested SVG scaling; checks do not detect all clipping, overlaps, glyph fallback, contrast or PDF renderer differences.",
+    }
+
+
+def audit_scene_geometry(scene: dict) -> dict:
+    """Detect pairwise node overlaps in a manually positioned scene.
+
+    This is a conservative axis-aligned bounding-box check. It does not measure
+    text glyph bounds, edge crossings, or intentional overlap semantics.
+    """
+    canvas = scene["canvas"]
+    nodes = scene["nodes"]
+    overlaps = []
+    for index, left in enumerate(nodes):
+        lx, ly = float(left["x_mm"]), float(left["y_mm"])
+        lw, lh = float(left["width_mm"]), float(left["height_mm"])
+        for right in nodes[index + 1:]:
+            rx, ry = float(right["x_mm"]), float(right["y_mm"])
+            rw, rh = float(right["width_mm"]), float(right["height_mm"])
+            if lx < rx + rw and lx + lw > rx and ly < ry + rh and ly + lh > ry:
+                overlaps.append([left["id"], right["id"]])
+    issues = ["node_overlap"] if overlaps else []
+    return {
+        "within_canvas": all(
+            float(node["x_mm"]) >= 0 and float(node["y_mm"]) >= 0
+            and float(node["x_mm"]) + float(node["width_mm"]) <= float(canvas["width_mm"])
+            and float(node["y_mm"]) + float(node["height_mm"]) <= float(canvas["height_mm"])
+            for node in nodes
+        ),
+        "overlapping_node_pairs": overlaps,
+        "issues": issues,
+        "limitations": "Axis-aligned node bounds only; no text measurement, edge-crossing or intentional-overlap analysis.",
     }
