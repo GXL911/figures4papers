@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/GXL911/figures4papers/blob/main/schemas/design-brief.schema.json",
+  "$id": "https://github.com/GXL911/figures4papers/schemas/design-brief.schema.json",
   "title": "Scientific Figure Design Brief",
   "type": "object",
   "additionalProperties": false,
@@ -69,7 +69,33 @@
           "exclusiveMinimum": 0
         },
         "preferred_layout": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "left_to_right",
+            "top_to_bottom",
+            "layered_hierarchy",
+            "branched_pipeline",
+            "skip_connection",
+            "hub_and_spoke",
+            "attention_links",
+            "paired_stacks",
+            "paired_branches",
+            "parallel_branches",
+            "converging_paths",
+            "feedback_loop",
+            "paired_panels",
+            "mechanism_plus_systems",
+            "matrix_grid",
+            "small_multiples",
+            "side_by_side",
+            "paired_diagnostic_panels",
+            "single_panel_curve",
+            "diagonal_reference",
+            "graph_neighborhood",
+            "neighborhood_expansion",
+            "token_sequence",
+            "shared_backbone"
+          ]
         },
         "minimum_font_size_pt": {
           "type": "number",
@@ -85,10 +111,12 @@
               "drawio",
               "pptx"
             ]
-          }
+          },
+          "uniqueItems": true,
+          "minItems": 1
         }
       },
-      "additionalProperties": true
+      "additionalProperties": false
     },
     "known_limitations": {
       "type": "array",
@@ -166,7 +194,9 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "minItems": 1,
+          "uniqueItems": true
         },
         "data_contract": {
           "type": "object"

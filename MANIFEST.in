@@ -1,1 +1,2 @@
 recursive-include data/reference-atlas *.json *.jsonl
+recursive-include schemas *.json

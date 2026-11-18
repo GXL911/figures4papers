@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/GXL911/figures4papers/blob/main/schemas/scene.schema.json",
+  "$id": "https://github.com/GXL911/figures4papers/schemas/scene.schema.json",
   "title": "Scientific Figure Scene Graph",
   "type": "object",
   "additionalProperties": false,
@@ -82,6 +82,10 @@
         "layer_gap_mm": {
           "type": "number",
           "minimum": 0
+        },
+        "pattern": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -228,7 +232,8 @@
       "required": [
         "id",
         "source",
-        "target"
+        "target",
+        "kind"
       ],
       "properties": {
         "id": {
@@ -275,6 +280,10 @@
             "orthogonal",
             "spline"
           ]
+        },
+        "font_size_pt": {
+          "type": "number",
+          "exclusiveMinimum": 0
         }
       }
     }

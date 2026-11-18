@@ -33,6 +33,30 @@ FIELD_WEIGHTS = {
     "venue": 0.3,
 }
 RIGHTS_STATUSES = {"reference_only", "open_license", "permission_confirmed", "unknown"}
+_TAXONOMY_FIELD_MAP = {
+    "figure_role": "figure_roles",
+    "visual_form": "visual_forms",
+    "layout_patterns": "layout_patterns",
+    "scientific_intents": "scientific_intents",
+    "evidence_types": "evidence_types",
+}
+
+
+def _validate_taxonomy(data: Mapping[str, Any]) -> dict[str, Any]:
+    if not isinstance(data, Mapping):
+        raise AtlasValidationError("taxonomy must be a JSON object.")
+    version = data.get("taxonomy_version")
+    if not isinstance(version, str) or not version.strip():
+        raise AtlasValidationError("taxonomy_version must be a nonblank string.")
+    normalized = dict(data)
+    for field in _TAXONOMY_FIELD_MAP.values():
+        values = data.get(field)
+        if (not isinstance(values, list) or not values
+                or any(not isinstance(value, str) or not value.strip() for value in values)):
+            raise AtlasValidationError(f"taxonomy.{field} must be a nonempty list of nonblank strings.")
+        if len({value.casefold() for value in values}) != len(values):
+            raise AtlasValidationError(f"taxonomy.{field} contains duplicate values.")
+    return normalized
 
 
 class AtlasValidationError(ValueError):
@@ -51,6 +75,15 @@ def _required_text(data: Mapping[str, Any], key: str) -> str:
     value = data.get(key)
     if not isinstance(value, str) or not value.strip():
         raise AtlasValidationError(f"{key} must be a nonblank string.")
+    return value.strip()
+
+
+def _optional_text(data: Mapping[str, Any], key: str) -> str | None:
+    value = data.get(key)
+    if value is None:
+        return None
+    if not isinstance(value, str) or not value.strip():
+        raise AtlasValidationError(f"{key} must be null or a nonblank string.")
     return value.strip()
 
 
@@ -78,11 +111,12 @@ class PaperRecord:
     doi: str | None = None
     arxiv_id: str | None = None
     metadata_source_url: str | None = None
+    pdf_url: str | None = None
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "PaperRecord":
         year = data.get("year")
-        if not isinstance(year, int) or year < 1900 or year > 2200:
+        if type(year) is not int or year < 1900 or year > 2200:
             raise AtlasValidationError("paper.year must be a plausible integer.")
         return cls(
             paper_id=_required_text(data, "paper_id"),
@@ -92,9 +126,10 @@ class PaperRecord:
             venue=_required_text(data, "venue"),
             paper_url=_required_text(data, "paper_url"),
             abstract=str(data.get("abstract", "")).strip(),
-            doi=data.get("doi"),
-            arxiv_id=data.get("arxiv_id"),
-            metadata_source_url=data.get("metadata_source_url"),
+            doi=_optional_text(data, "doi"),
+            arxiv_id=_optional_text(data, "arxiv_id"),
+            metadata_source_url=_optional_text(data, "metadata_source_url"),
+            pdf_url=_optional_text(data, "pdf_url"),
         )
 
 
@@ -118,6 +153,7 @@ class FigureRecord:
     rights_status: str
     curation_status: str
     metadata_source_url: str
+    panel_ids: tuple[str, ...] = ()
     figure_url: str | None = None
     local_asset: str | None = None
     license: str | None = None
@@ -127,9 +163,9 @@ class FigureRecord:
     def from_dict(cls, data: Mapping[str, Any]) -> "FigureRecord":
         panel_count = data.get("panel_count", 1)
         page = data.get("page")
-        if not isinstance(panel_count, int) or panel_count < 1:
+        if type(panel_count) is not int or panel_count < 1:
             raise AtlasValidationError("figure.panel_count must be a positive integer.")
-        if page is not None and (not isinstance(page, int) or page < 1):
+        if page is not None and (type(page) is not int or page < 1):
             raise AtlasValidationError("figure.page must be a positive 1-based page number.")
         rights_status = _required_text(data, "rights_status")
         if rights_status not in RIGHTS_STATUSES:
@@ -158,13 +194,14 @@ class FigureRecord:
             methods=_text_list(data, "methods"),
             tasks=_text_list(data, "tasks"),
             panel_count=panel_count,
+            panel_ids=_text_list(data, "panel_ids"),
             page=page,
             rights_status=rights_status,
             curation_status=curation_status,
             metadata_source_url=_required_text(data, "metadata_source_url"),
-            figure_url=data.get("figure_url"),
-            local_asset=local_asset,
-            license=license_name,
+            figure_url=_optional_text(data, "figure_url"),
+            local_asset=_optional_text(data, "local_asset"),
+            license=_optional_text(data, "license"),
             notes=str(data.get("notes", "")).strip(),
         )
 
@@ -187,7 +224,22 @@ class SearchHit:
             "year": self.paper.year,
             "venue": self.paper.venue,
             "paper_url": self.paper.paper_url,
+            "pdf_url": self.paper.pdf_url,
+            "paper_metadata_source_url": self.paper.metadata_source_url,
+            "doi": self.paper.doi,
+            "arxiv_id": self.paper.arxiv_id,
             "figure_number": self.figure.figure_number,
+            "figure_locator": {
+                "figure_number": self.figure.figure_number,
+                "page": self.figure.page,
+                "pdf_url": self.paper.pdf_url,
+                "figure_url": self.figure.figure_url,
+                "panel_ids": list(self.figure.panel_ids),
+                "local_asset": self.figure.local_asset,
+            },
+            "metadata_source_url": self.figure.metadata_source_url,
+            "license": self.figure.license,
+            "notes": self.figure.notes,
             "caption": self.figure.caption,
             "summary": self.figure.summary,
             "figure_role": self.figure.figure_role,
@@ -299,7 +351,13 @@ def reciprocal_rank_fusion(
 class ReferenceAtlas:
     """Validated in-memory atlas with lexical, facet and optional semantic retrieval."""
 
-    def __init__(self, papers: Sequence[PaperRecord], figures: Sequence[FigureRecord]):
+    def __init__(
+        self,
+        papers: Sequence[PaperRecord],
+        figures: Sequence[FigureRecord],
+        taxonomy: Mapping[str, Any] | None = None,
+    ):
+        self.taxonomy = _validate_taxonomy(taxonomy) if taxonomy is not None else None
         self.papers = {paper.paper_id: paper for paper in papers}
         self.figures = {figure.figure_id: figure for figure in figures}
         if len(self.papers) != len(papers):
@@ -309,6 +367,17 @@ class ReferenceAtlas:
         missing = sorted({figure.paper_id for figure in figures} - set(self.papers))
         if missing:
             raise AtlasValidationError(f"Figures refer to unknown paper_id values: {missing}")
+        if self.taxonomy is not None:
+            for figure in figures:
+                for record_field, taxonomy_field in _TAXONOMY_FIELD_MAP.items():
+                    values = getattr(figure, record_field)
+                    values = values if isinstance(values, tuple) else (values,)
+                    allowed = {value.casefold() for value in self.taxonomy[taxonomy_field]}
+                    invalid = [value for value in values if value.casefold() not in allowed]
+                    if invalid:
+                        raise AtlasValidationError(
+                            f"Figure {figure.figure_id} has values outside taxonomy.{taxonomy_field}: {invalid}"
+                        )
 
     @classmethod
     def from_directory(cls, directory: str | Path) -> "ReferenceAtlas":
@@ -328,7 +397,14 @@ class ReferenceAtlas:
             return rows
         papers = [PaperRecord.from_dict(row) for row in read_jsonl("papers.jsonl")]
         figures = [FigureRecord.from_dict(row) for row in read_jsonl("figures.jsonl")]
-        return cls(papers, figures)
+        taxonomy_path = root / "taxonomy.json"
+        if not taxonomy_path.is_file():
+            raise FileNotFoundError(str(taxonomy_path))
+        try:
+            taxonomy = json.loads(taxonomy_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise AtlasValidationError(f"{taxonomy_path}: {exc}") from exc
+        return cls(papers, figures, taxonomy=taxonomy)
 
     def _fields(self, figure: FigureRecord, paper: PaperRecord) -> dict[str, str]:
         return {
@@ -352,7 +428,9 @@ class ReferenceAtlas:
         if isinstance(value, str):
             return {value.casefold()}
         if isinstance(value, (list, tuple, set)):
-            return {str(item).casefold() for item in value}
+            if any(not isinstance(item, str) or not item.strip() for item in value):
+                raise ValueError("Facet values must contain only nonblank strings.")
+            return {item.casefold() for item in value}
         raise ValueError("Facet values must be strings or lists of strings.")
 
     def _passes_filters(self, figure: FigureRecord, paper: PaperRecord, filters: Mapping[str, Any]) -> bool:
@@ -367,11 +445,23 @@ class ReferenceAtlas:
             "tasks": {item.casefold() for item in figure.tasks},
             "venue": {paper.venue.casefold()},
         }
+        year_min = filters.get("year_min")
+        year_max = filters.get("year_max")
+        if "year_min" in filters and type(year_min) is not int:
+            raise ValueError("year_min must be an integer.")
+        if "year_max" in filters and type(year_max) is not int:
+            raise ValueError("year_max must be an integer.")
+        if "year_min" in filters and "year_max" in filters and year_min > year_max:
+            raise ValueError("year_min must not exceed year_max.")
         for key, value in filters.items():
-            if key == "year_min" and paper.year < int(value):
-                return False
-            if key == "year_max" and paper.year > int(value):
-                return False
+            if key == "year_min":
+                if paper.year < year_min:
+                    return False
+                continue
+            if key == "year_max":
+                if paper.year > year_max:
+                    return False
+                continue
             if key not in field_map:
                 raise ValueError(f"Unknown reference-atlas filter: {key}")
             expected = self._values(value)

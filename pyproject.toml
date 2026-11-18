@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "figures4papers"
-version = "0.3.0a1"
+version = "0.3.1"
 description = "Reference-grounded, reproducible scientific figure design, rendering and validation."
 requires-python = ">=3.10"
-dependencies = ["numpy>=1.24", "matplotlib>=3.7", "scipy>=1.10", "pillow>=10"]
+dependencies = ["numpy>=1.24", "matplotlib>=3.7", "scipy>=1.10", "pillow>=10", "jsonschema>=4.22"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.6"]
+dev = ["pytest>=8", "ruff>=0.6", "build>=1.2"]
 legacy = ["seaborn>=0.13", "python-dateutil>=2.8"]
 illustration = ["CairoSVG>=2.7"]
 
@@ -21,11 +21,22 @@ figures4papers-evaluate-reference = "figures4papers.retrieval_eval:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E9", "F63", "F7", "F82"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
 
 [tool.setuptools.data-files]
+"share/figures4papers/schemas" = [
+  "schemas/design-brief.schema.json",
+  "schemas/scene.schema.json",
+]
 "share/figures4papers/reference-atlas" = [
   "data/reference-atlas/papers.jsonl",
   "data/reference-atlas/figures.jsonl",
