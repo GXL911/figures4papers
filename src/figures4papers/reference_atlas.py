@@ -194,6 +194,7 @@ class SearchHit:
             "visual_form": self.figure.visual_form,
             "layout_patterns": list(self.figure.layout_patterns),
             "scientific_intents": list(self.figure.scientific_intents),
+            "evidence_types": list(self.figure.evidence_types),
             "domains": list(self.figure.domains),
             "methods": list(self.figure.methods),
             "tasks": list(self.figure.tasks),
