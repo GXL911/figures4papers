@@ -209,6 +209,7 @@ def test_visual_qa_converts_css_pixels_to_points():
 def test_geometry_qa_detects_node_overlap():
     _, scene = load_examples()
     scene["nodes"][1]["x_mm"] = 10
+    scene["nodes"][1]["y_mm"] = 35
     report = audit_scene_geometry(scene)
     assert report["overlapping_node_pairs"]
     assert "node_overlap" in report["issues"]
