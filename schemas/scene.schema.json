@@ -100,6 +100,10 @@
     },
     "metadata": {
       "type": "object"
+    },
+    "brief_id": {
+      "type": "string",
+      "minLength": 1
     }
   },
   "allOf": [
@@ -200,6 +204,21 @@
         "stroke": {
           "type": "string",
           "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "content_block_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scientific_role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "panel_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_source": {
+          "type": "string"
         }
       }
     },

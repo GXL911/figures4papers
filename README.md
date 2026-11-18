@@ -18,6 +18,7 @@ v0.3 is being developed on feature/research-figure-making-v0.3, based on the v0.
 | Retrieval qrels and metrics | 8-query development set implemented |
 | Design Brief JSON Schema and validator | Implemented |
 | Scene Graph JSON Schema and validator | Implemented |
+| Design Brief → Scene Graph content traceability | Implemented |
 | Manual deterministic SVG scene rendering | Implemented |
 | Editable draw.io XML export | Implemented for manual-layout box/ellipse scenes |
 | ELK automatic layout | Contract/roadmap only; not implemented |
@@ -43,7 +44,7 @@ Evaluate the small, hand-curated development qrels:
 
 Render the sample hybrid-memory scene to SVG and draw.io:
 
-    python tools/render_scene.py examples/hybrid_memory_scene.json --out /tmp/hybrid-memory
+    python tools/render_scene.py examples/hybrid_memory_scene.json --brief examples/hybrid_memory_design_brief.json --out /tmp/hybrid-memory
 
 The retrieval qrels are development fixtures, not an independently judged benchmark. Their scores must not be interpreted as general retrieval-quality claims.
 
@@ -69,7 +70,7 @@ LLMs may propose a Design Brief and Scene Graph. They do not directly paint fina
 - src/figures4papers/retrieval_eval.py: MRR, Recall@k and nDCG@k.
 - schemas/design-brief.schema.json: semantic design contract.
 - schemas/scene.schema.json: renderer-neutral scene graph contract.
-- src/figures4papers/design_contracts.py: runtime validation and deterministic SVG adapter.
+- src/figures4papers/design_contracts.py: runtime validation, brief-to-scene traceability and deterministic SVG adapter.
 - src/figures4papers/drawio_export.py: native mxCell export for editable diagrams.
 - docs/V0.3_ARCHITECTURE.md: architecture, decisions, limits and roadmap.
 - docs/RESEARCH_REFERENCES.md: primary papers and official technical documentation.

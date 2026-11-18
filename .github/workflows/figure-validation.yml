@@ -40,7 +40,7 @@ jobs:
           figures4papers-reference --query "selective state space hardware-aware scan" --limit 3 > /tmp/reference-search.json
           python -m figures4papers.retrieval_eval --k 5 --out /tmp/reference-eval.json
           python -c 'import json; print(json.dumps(json.load(open("/tmp/reference-eval.json"))["macro_average"], indent=2))'
-          python tools/render_scene.py examples/hybrid_memory_scene.json --out /tmp/hybrid-memory
+          python tools/render_scene.py examples/hybrid_memory_scene.json --brief examples/hybrid_memory_design_brief.json --out /tmp/hybrid-memory
           test -s /tmp/hybrid-memory.svg
           test -s /tmp/hybrid-memory.drawio
           test -s /tmp/hybrid-memory.manifest.json

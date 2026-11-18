@@ -106,6 +106,9 @@ def validate_scene(scene: Mapping[str, Any]) -> dict[str, Any]:
         node_height = _positive(node.get("height_mm"), f"nodes[{node_id}].height_mm")
         if node.get("style_token", "primary") not in _STYLE_TOKENS:
             raise DesignContractError(f"Unknown style_token on node {node_id}.")
+        for semantic_key in ("content_block_id", "scientific_role", "panel_id", "evidence_source"):
+            if semantic_key in node:
+                _text(node[semantic_key], f"nodes[{node_id}].{semantic_key}")
         for color_key in ("fill", "stroke"):
             if color_key in node and not _HEX_COLOR.fullmatch(str(node[color_key])):
                 raise DesignContractError(f"nodes[{node_id}].{color_key} must be a six-digit hex color.")
@@ -138,6 +141,38 @@ def validate_scene(scene: Mapping[str, Any]) -> dict[str, Any]:
         if edge.get("route", "straight") not in {"straight", "orthogonal", "spline"}:
             raise DesignContractError(f"Unsupported edge route on {edge_id}.")
     return dict(scene)
+
+def validate_scene_against_brief(brief: Mapping[str, Any], scene: Mapping[str, Any]) -> dict[str, Any]:
+    """Enforce traceability from planned scientific content to rendered nodes."""
+    brief = validate_design_brief(brief)
+    scene = validate_scene(scene)
+    if scene.get("brief_id") and scene["brief_id"] != brief["brief_id"]:
+        raise DesignContractError("Scene brief_id does not match the supplied Design Brief.")
+    blocks = {block["id"]: block for block in brief["content_blocks"]}
+    panels = {panel["panel_id"]: panel for panel in brief["panel_plan"]}
+    mapped: dict[str, set[str]] = {panel_id: set() for panel_id in panels}
+    for node in scene["nodes"]:
+        block_id, panel_id = node.get("content_block_id"), node.get("panel_id")
+        if block_id and block_id not in blocks:
+            raise DesignContractError(f"Node {node['id']} refers to unknown content block {block_id}.")
+        if panel_id and panel_id not in panels:
+            raise DesignContractError(f"Node {node['id']} refers to unknown panel {panel_id}.")
+        if block_id:
+            expected_role = blocks[block_id]["scientific_role"]
+            if node.get("scientific_role") and node["scientific_role"] != expected_role:
+                raise DesignContractError(f"Node {node['id']} scientific_role conflicts with content block {block_id}.")
+            if panel_id:
+                mapped[panel_id].add(block_id)
+            elif len(panels) == 1:
+                mapped[next(iter(panels))].add(block_id)
+            else:
+                raise DesignContractError(f"Node {node['id']} needs panel_id because the brief has multiple panels.")
+    for panel_id, panel in panels.items():
+        missing = set(panel.get("content_block_ids", [])) - mapped[panel_id]
+        if missing:
+            raise DesignContractError(f"Panel {panel_id} is missing scene nodes for content blocks: {sorted(missing)}")
+    return dict(scene)
+
 
 def _boundary_point(node: Mapping[str, Any], toward: tuple[float, float]) -> tuple[float, float]:
     x, y = float(node["x_mm"]), float(node["y_mm"])

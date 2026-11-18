@@ -22,7 +22,10 @@
       "y_mm": 30,
       "width_mm": 28,
       "height_mm": 16,
-      "style_token": "primary"
+      "style_token": "primary",
+      "content_block_id": "input",
+      "scientific_role": "source",
+      "panel_id": "architecture"
     },
     {
       "id": "local-fir",
@@ -33,7 +36,10 @@
       "y_mm": 7,
       "width_mm": 34,
       "height_mm": 18,
-      "style_token": "accent"
+      "style_token": "accent",
+      "content_block_id": "local_fir",
+      "scientific_role": "operator",
+      "panel_id": "architecture"
     },
     {
       "id": "global-ssm",
@@ -44,7 +50,10 @@
       "y_mm": 50,
       "width_mm": 34,
       "height_mm": 18,
-      "style_token": "secondary"
+      "style_token": "secondary",
+      "content_block_id": "global_ssm",
+      "scientific_role": "operator",
+      "panel_id": "architecture"
     },
     {
       "id": "fusion",
@@ -55,7 +64,10 @@
       "y_mm": 29,
       "width_mm": 36,
       "height_mm": 18,
-      "style_token": "warning"
+      "style_token": "warning",
+      "content_block_id": "fusion",
+      "scientific_role": "operator",
+      "panel_id": "architecture"
     },
     {
       "id": "forecast",
@@ -66,7 +78,10 @@
       "y_mm": 30,
       "width_mm": 27,
       "height_mm": 16,
-      "style_token": "primary"
+      "style_token": "primary",
+      "content_block_id": "output",
+      "scientific_role": "prediction",
+      "panel_id": "architecture"
     }
   ],
   "edges": [
@@ -100,5 +115,6 @@
       "target": "forecast",
       "kind": "data_flow"
     }
-  ]
+  ],
+  "brief_id": "hybrid-memory-brief-v1"
 }

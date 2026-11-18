@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0",
+  "brief_id": "hybrid-memory-brief-v1",
+  "research_question": "How can a forecasting operator preserve short-range local structure while retaining compressed long-range memory?",
+  "intended_takeaway": "A local FIR pathway captures high-fidelity short-range patterns, a global SSM pathway carries compressed long-range context, and a fusion operator combines both representations before forecasting.",
+  "figure_role": "mechanism_explanation",
+  "content_blocks": [
+    {
+      "id": "input",
+      "label": "Historical input",
+      "scientific_role": "source",
+      "description": "Observed historical sequence supplied to both pathways."
+    },
+    {
+      "id": "local_fir",
+      "label": "Local FIR",
+      "scientific_role": "operator",
+      "description": "Finite impulse response operator for local, high-fidelity temporal patterns."
+    },
+    {
+      "id": "global_ssm",
+      "label": "Global SSM",
+      "scientific_role": "operator",
+      "description": "State-space pathway that compresses longer historical context into a recurrent state."
+    },
+    {
+      "id": "fusion",
+      "label": "Feature fusion",
+      "scientific_role": "operator",
+      "description": "Combines local and global representations before the prediction head."
+    },
+    {
+      "id": "output",
+      "label": "Forecast output",
+      "scientific_role": "prediction",
+      "description": "Point forecast or predictive distribution, depending on the downstream task."
+    }
+  ],
+  "panel_plan": [
+    {
+      "panel_id": "architecture",
+      "claim": "Local and global memory pathways process the same historical input and are fused before forecasting.",
+      "visual_form": "block_diagram",
+      "content_block_ids": [
+        "input",
+        "local_fir",
+        "global_ssm",
+        "fusion",
+        "output"
+      ]
+    }
+  ],
+  "references": [
+    {
+      "figure_id": "mamba-2023-fig1",
+      "reason_for_use": "Reference for selective state-space mechanism and the separation of algorithmic and systems views."
+    },
+    {
+      "figure_id": "s4-2021-fig1",
+      "reason_for_use": "Reference for presenting a structured state-space operator as a reusable sequence layer."
+    },
+    {
+      "figure_id": "resnet-2016-fig2",
+      "reason_for_use": "Reference for making parallel information pathways and their fusion visually explicit."
+    }
+  ],
+  "constraints": {
+    "target_width_mm": 178,
+    "target_height_mm": 76,
+    "preferred_layout": "left_to_right",
+    "minimum_font_size_pt": 7,
+    "output_formats": [
+      "svg",
+      "drawio"
+    ]
+  },
+  "known_limitations": [
+    "This is a conceptual architecture specification, not an empirical result.",
+    "The exact fusion operator and predictive head are intentionally abstracted."
+  ]
+}

@@ -11,7 +11,7 @@ from figures4papers.retrieval_eval import (
     evaluate_queries, ndcg_at_k, recall_at_k, reciprocal_rank,
 )
 from figures4papers.design_contracts import (
-    DesignContractError, render_scene_svg, validate_design_brief, validate_scene,
+    DesignContractError, render_scene_svg, validate_design_brief, validate_scene, validate_scene_against_brief,
 )
 from figures4papers.drawio_export import export_drawio, scene_to_drawio_xml
 
@@ -194,3 +194,12 @@ def test_local_assets_require_explicit_rights():
 def test_json_schemas_are_valid_json_documents():
     json.loads((ROOT / "schemas" / "design-brief.schema.json").read_text(encoding="utf-8"))
     json.loads((ROOT / "schemas" / "scene.schema.json").read_text(encoding="utf-8"))
+
+
+def test_about_conv_design_brief_and_scene_are_semantically_linked():
+    brief = json.loads((ROOT / "examples" / "hybrid_memory_design_brief.json").read_text(encoding="utf-8"))
+    scene = json.loads((ROOT / "examples" / "hybrid_memory_scene.json").read_text(encoding="utf-8"))
+    assert validate_scene_against_brief(brief, scene)["brief_id"] == brief["brief_id"]
+    scene["nodes"][1]["content_block_id"] = "not-in-the-brief"
+    with pytest.raises(DesignContractError):
+        validate_scene_against_brief(brief, scene)
