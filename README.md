@@ -35,7 +35,7 @@ Python 3.10 or later:
 
 Search the reference atlas:
 
-    python -m figures4papers.reference_atlas --query "selective state space hardware-aware scan" --limit 5
+    figures4papers-reference --query "selective state space hardware-aware scan" --limit 5
 
 Evaluate the small, hand-curated development qrels:
 

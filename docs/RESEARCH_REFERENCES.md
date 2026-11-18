@@ -25,6 +25,7 @@ Robertson & Walker (1994), *Some Simple Effective Approximations to the 2-Poisso
 
 ### 4. Reciprocal Rank Fusion
 Cormack, Clarke & Buettcher (2009), *Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank Learning Methods*, SIGIR 2009.
+- Original author-hosted PDF: https://cormack.uwaterloo.ca/cormack/cormacksigir09-rrf.pdf
 - DOI: https://doi.org/10.1145/1571941.1572114
 - Google Research record: https://research.google/pubs/reciprocal-rank-fusion-outperforms-condorcet-and-individual-rank-learning-methods/
 - Design decision: fuse independent lexical, structured and optional semantic rankings by rank rather than summing incomparable raw scores.

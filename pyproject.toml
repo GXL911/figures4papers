@@ -24,3 +24,11 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+
+[tool.setuptools.data-files]
+"share/figures4papers/reference-atlas" = [
+  "data/reference-atlas/papers.jsonl",
+  "data/reference-atlas/figures.jsonl",
+  "data/reference-atlas/queries.json",
+  "data/reference-atlas/taxonomy.json",
+]

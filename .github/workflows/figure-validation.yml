@@ -37,8 +37,9 @@ jobs:
         env:
           MPLBACKEND: Agg
         run: |
-          python -m figures4papers.reference_atlas --query "selective state space hardware-aware scan" --limit 3 > /tmp/reference-search.json
+          figures4papers-reference --query "selective state space hardware-aware scan" --limit 3 > /tmp/reference-search.json
           python -m figures4papers.retrieval_eval --k 5 --out /tmp/reference-eval.json
+          python -c 'import json; print(json.dumps(json.load(open("/tmp/reference-eval.json"))["macro_average"], indent=2))'
           python tools/render_scene.py examples/hybrid_memory_scene.json --out /tmp/hybrid-memory
           test -s /tmp/hybrid-memory.svg
           test -s /tmp/hybrid-memory.drawio
@@ -92,6 +93,11 @@ jobs:
         with:
           name: figure-review-python312
           path: |
+            /tmp/reference-search.json
+            /tmp/reference-eval.json
+            /tmp/hybrid-memory.svg
+            /tmp/hybrid-memory.drawio
+            /tmp/hybrid-memory.manifest.json
             /tmp/figure-generated/
             /tmp/figure-benchmark/
             /tmp/figure-benchmark-review/

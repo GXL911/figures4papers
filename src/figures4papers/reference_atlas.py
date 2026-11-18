@@ -10,8 +10,9 @@ import argparse
 import json
 import math
 import re
+import sysconfig
 from collections import Counter
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -480,7 +481,13 @@ class ReferenceAtlas:
 
 
 def _default_atlas_dir() -> Path:
-    return Path(__file__).resolve().parents[2] / "data" / "reference-atlas"
+    source_checkout = Path(__file__).resolve().parents[2] / "data" / "reference-atlas"
+    if source_checkout.is_dir():
+        return source_checkout
+    installed_data = Path(sysconfig.get_path("data")) / "share" / "figures4papers" / "reference-atlas"
+    if installed_data.is_dir():
+        return installed_data
+    return source_checkout
 
 
 def main(argv: Sequence[str] | None = None) -> int:
