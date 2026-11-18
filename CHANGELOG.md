@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased — Research Figure Making v0.3 foundations
+
+- Add a metadata-first Paper Figure Atlas with 16 provisional figure references from 16 papers; no third-party figure binaries are redistributed.
+- Separate scientific intent, figure role, visual form, layout pattern and evidence type in a versioned taxonomy.
+- Add fielded BM25 retrieval, hard metadata filters, soft structural ranking and Reciprocal Rank Fusion.
+- Add an optional semantic-score hook without bundling a large CLIP runtime or model weights.
+- Add an eight-query hand-curated retrieval development set and MRR, Recall@k and nDCG@k evaluation utilities.
+- Add JSON Schemas and runtime validators for Scientific Figure Design Briefs and Scene Graphs.
+- Add Design Brief-to-Scene Graph traceability using content-block, panel and scientific-role IDs.
+- Add deterministic SVG rendering for manually positioned box/circle scenes and editable draw.io XML export.
+- Add architecture and research-source documentation; clarify that ELK layout, CLIP runtime, PPTX export and full visual QA remain future work.
+
 ## Unreleased — Research Figure Making v0.2
 
 - Add physical-size-aware `DesignTokens` and 89 mm / 178 mm presets.

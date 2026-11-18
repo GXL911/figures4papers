@@ -1,0 +1,282 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/GXL911/figures4papers/blob/main/schemas/scene.schema.json",
+  "title": "Scientific Figure Scene Graph",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "figure_id",
+    "title",
+    "canvas",
+    "layout",
+    "nodes",
+    "edges"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "figure_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "canvas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width_mm",
+        "height_mm",
+        "units"
+      ],
+      "properties": {
+        "width_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "units": {
+          "const": "mm"
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "manual",
+            "layered"
+          ]
+        },
+        "engine": {
+          "enum": [
+            "manual",
+            "elk-layered"
+          ]
+        },
+        "direction": {
+          "enum": [
+            "LR",
+            "TB"
+          ]
+        },
+        "node_gap_mm": {
+          "type": "number",
+          "minimum": 0
+        },
+        "layer_gap_mm": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edge"
+      }
+    },
+    "metadata": {
+      "type": "object"
+    },
+    "brief_id": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "layout": {
+            "properties": {
+              "mode": {
+                "const": "manual"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "required": [
+                "x_mm",
+                "y_mm"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "label",
+        "width_mm",
+        "height_mm"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "not": {
+            "enum": [
+              "0",
+              "1"
+            ]
+          }
+        },
+        "type": {
+          "enum": [
+            "box",
+            "ellipse"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "x_mm": {
+          "type": "number"
+        },
+        "y_mm": {
+          "type": "number"
+        },
+        "width_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "font_size_pt": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "style_token": {
+          "enum": [
+            "primary",
+            "secondary",
+            "accent",
+            "warning"
+          ]
+        },
+        "fill": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "stroke": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$"
+        },
+        "content_block_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scientific_role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "panel_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence_source": {
+          "type": "string"
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "target"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "not": {
+            "enum": [
+              "0",
+              "1"
+            ]
+          }
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "data_flow",
+            "control_flow",
+            "skip",
+            "attention",
+            "feedback",
+            "self_loop",
+            "other"
+          ]
+        },
+        "style": {
+          "enum": [
+            "solid",
+            "dashed"
+          ]
+        },
+        "route": {
+          "enum": [
+            "straight",
+            "orthogonal",
+            "spline"
+          ]
+        }
+      }
+    }
+  }
+}

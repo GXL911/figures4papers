@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0",
+  "figure_id": "hybrid-memory-mechanism-v0",
+  "title": "Local and global memory pathways",
+  "description": "Illustrative scene specification for a local FIR and global SSM hybrid. The diagram expresses an architecture hypothesis, not measured results.",
+  "canvas": {
+    "width_mm": 178,
+    "height_mm": 76,
+    "units": "mm"
+  },
+  "layout": {
+    "mode": "manual",
+    "engine": "manual"
+  },
+  "nodes": [
+    {
+      "id": "input",
+      "type": "box",
+      "label": "Historical input",
+      "subtitle": "sequence x[t]",
+      "x_mm": 4,
+      "y_mm": 30,
+      "width_mm": 28,
+      "height_mm": 16,
+      "style_token": "primary",
+      "content_block_id": "input",
+      "scientific_role": "source",
+      "panel_id": "architecture"
+    },
+    {
+      "id": "local-fir",
+      "type": "box",
+      "label": "Local FIR",
+      "subtitle": "short-range patterns",
+      "x_mm": 43,
+      "y_mm": 7,
+      "width_mm": 34,
+      "height_mm": 18,
+      "style_token": "accent",
+      "content_block_id": "local_fir",
+      "scientific_role": "operator",
+      "panel_id": "architecture"
+    },
+    {
+      "id": "global-ssm",
+      "type": "box",
+      "label": "Global SSM",
+      "subtitle": "compressed long memory",
+      "x_mm": 43,
+      "y_mm": 50,
+      "width_mm": 34,
+      "height_mm": 18,
+      "style_token": "secondary",
+      "content_block_id": "global_ssm",
+      "scientific_role": "operator",
+      "panel_id": "architecture"
+    },
+    {
+      "id": "fusion",
+      "type": "box",
+      "label": "Feature fusion",
+      "subtitle": "combine local + global",
+      "x_mm": 94,
+      "y_mm": 29,
+      "width_mm": 36,
+      "height_mm": 18,
+      "style_token": "warning",
+      "content_block_id": "fusion",
+      "scientific_role": "operator",
+      "panel_id": "architecture"
+    },
+    {
+      "id": "forecast",
+      "type": "box",
+      "label": "Forecast output",
+      "subtitle": "prediction / distribution",
+      "x_mm": 147,
+      "y_mm": 30,
+      "width_mm": 27,
+      "height_mm": 16,
+      "style_token": "primary",
+      "content_block_id": "output",
+      "scientific_role": "prediction",
+      "panel_id": "architecture"
+    }
+  ],
+  "edges": [
+    {
+      "id": "input-to-local",
+      "source": "input",
+      "target": "local-fir",
+      "kind": "data_flow"
+    },
+    {
+      "id": "input-to-global",
+      "source": "input",
+      "target": "global-ssm",
+      "kind": "data_flow"
+    },
+    {
+      "id": "local-to-fusion",
+      "source": "local-fir",
+      "target": "fusion",
+      "kind": "data_flow"
+    },
+    {
+      "id": "global-to-fusion",
+      "source": "global-ssm",
+      "target": "fusion",
+      "kind": "data_flow"
+    },
+    {
+      "id": "fusion-to-forecast",
+      "source": "fusion",
+      "target": "forecast",
+      "kind": "data_flow"
+    }
+  ],
+  "brief_id": "hybrid-memory-brief-v1"
+}

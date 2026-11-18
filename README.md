@@ -1,3 +1,48 @@
+# Research Figure Making v0.3 — Reference-Grounded Figure Design System
+
+This branch advances the existing v0.2 plotting, DiagramCanvas and FigureComposer foundations. It adds a metadata-first Paper Figure Atlas, fielded BM25 and structural retrieval, RRF ranking fusion, versioned Design Brief and Scene Graph contracts, deterministic SVG rendering from manual scenes, and editable draw.io export.
+
+## v0.3 implementation status
+
+- Reference Atlas: 16 paper records and 16 provisional figure records; metadata-only, no paper-image binaries.
+- Taxonomy: independent scientific intent, figure role, visual form, layout pattern and evidence type.
+- Retrieval: fielded BM25, hard filters, soft structural ranking, optional semantic-score hook and RRF.
+- Evaluation: eight hand-curated development queries with MRR@5, Recall@5 and nDCG@5. These qrels are smoke-test fixtures, not an independently judged benchmark.
+- Design: JSON Schemas and runtime validation for Design Brief and Scene Graph, including content-block-to-node traceability.
+- Rendering: deterministic manual-layout SVG through the existing DiagramCanvas.
+- Editable output: native draw.io mxCell export for the supported box/ellipse and connector subset.
+- Not yet implemented: CLIP model runtime/index, PDF figure extraction, ELK layered auto-layout, full visual collision QA, PPTX native-shape export and round-trip editing.
+
+## v0.3 quick start
+
+Python 3.10 or later:
+
+    python -m pip install -e ".[dev,illustration]"
+    python -m pytest -q
+
+Search references:
+
+    figures4papers-reference --query "selective state space hardware-aware scan" --limit 5
+
+Evaluate the development retrieval set:
+
+    python -m figures4papers.retrieval_eval --k 5 --out /tmp/reference-retrieval-eval.json
+
+Render and validate the About-Conv example:
+
+    python tools/render_scene.py examples/hybrid_memory_scene.json --brief examples/hybrid_memory_design_brief.json --out /tmp/hybrid-memory
+
+Architecture and evidence:
+- docs/V0.3_ARCHITECTURE.md
+- docs/RESEARCH_REFERENCES.md
+- docs/REFERENCE_ATLAS_EVALUATION.md
+
+The 16 seed figure records remain provisional until each original PDF figure, caption, panel boundary and reuse rights have been visually verified. The repository does not mirror third-party paper artwork.
+
+---
+
+# Existing v0.2 README and upstream project content (preserved)
+
 # Fork development: Research Figure Making v0.2
 
 This GXL911 fork extends Chen Liu's original `figures4papers` case-study
@@ -118,7 +163,6 @@ Please feel free to cite any of these papers if you find them relevant or helpfu
 <img align="left" src="figure_VIGIL/figures/comparison_posttraining.png" width="350" alt="Post-training comparison">
 <br clear="all">
 </p>
-
 </div>
 
 ### Concept plots
@@ -237,8 +281,7 @@ Restart the agent (or refresh its skill list) after linking. You can then invoke
 @inproceedings{liu2026dispersion,
   title={Dispersion loss counteracts embedding condensation and improves generalization in small language models},
   author={Liu, Chen and Sun, Xingzhi and Xiao, Xi and Van Tassel, Alexandre and Xu, Ke and Reimann, Kristof and Liao, Danqi and Gerstein, Mark and Wang, Tianyang and Wang, Xiao and Krishnaswamy, Smita},
-  booktitle={International Conference on Machine Learning},
-  year={2026},
+  booktitle={International Conference on Machine Learning},  year={2026},
   organization={PMLR}
 }
 ```

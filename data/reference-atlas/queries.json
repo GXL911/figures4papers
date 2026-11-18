@@ -1,0 +1,111 @@
+[
+  {
+    "query_id": "q01-transformer-attention",
+    "query": "encoder decoder transformer self attention cross attention positional encoding architecture",
+    "facets": {
+      "figure_role": [
+        "architecture_overview"
+      ],
+      "visual_form": [
+        "block_diagram",
+        "pipeline_diagram"
+      ]
+    },
+    "qrels": {
+      "transformer-2017-fig1": 3,
+      "bahdanau-2015-fig1": 2,
+      "t5-2019-fig1": 1
+    }
+  },
+  {
+    "query_id": "q02-residual-mechanism",
+    "query": "identity shortcut skip connection residual branch element wise addition mechanism",
+    "facets": {
+      "figure_role": [
+        "mechanism_explanation"
+      ]
+    },
+    "qrels": {
+      "resnet-2016-fig2": 3
+    }
+  },
+  {
+    "query_id": "q03-moe-routing",
+    "query": "sparse mixture of experts token routing top k gating expert load balancing dispatch",
+    "facets": {
+      "domains": [
+        "mixture_of_experts"
+      ]
+    },
+    "qrels": {
+      "moe-2017-fig1": 3,
+      "switch-2021-fig1": 2
+    }
+  },
+  {
+    "query_id": "q04-selective-state-space",
+    "query": "selective state space input dependent scan hardware aware long sequence modeling",
+    "facets": {
+      "domains": [
+        "state_space_models"
+      ]
+    },
+    "qrels": {
+      "mamba-2023-fig1": 3,
+      "s4-2021-fig1": 2
+    }
+  },
+  {
+    "query_id": "q05-contrastive-learning",
+    "query": "contrastive learning image augmentations encoder projection head positive negative views loss",
+    "facets": {
+      "scientific_intents": [
+        "describe_method",
+        "describe_training"
+      ]
+    },
+    "qrels": {
+      "simclr-2020-fig2": 3,
+      "clip-2021-fig1": 2
+    }
+  },
+  {
+    "query_id": "q06-vision-transformer",
+    "query": "vision transformer image patch tokens positional embedding class token encoder",
+    "facets": {
+      "domains": [
+        "computer_vision"
+      ]
+    },
+    "qrels": {
+      "vit-2020-fig1": 3,
+      "dino-2021-fig1": 2
+    }
+  },
+  {
+    "query_id": "q07-graph-neighborhood",
+    "query": "graph neural network node neighborhood message passing aggregation sampled neighbors",
+    "facets": {
+      "domains": [
+        "graph_learning"
+      ]
+    },
+    "qrels": {
+      "gcn-2017-fig1": 3,
+      "graphsage-2017-fig1": 3
+    }
+  },
+  {
+    "query_id": "q08-probabilistic-calibration",
+    "query": "reliability diagram nominal empirical coverage predictive uncertainty calibration curve confidence",
+    "facets": {
+      "figure_role": [
+        "calibration_diagnostic"
+      ]
+    },
+    "qrels": {
+      "guo-2017-fig1": 3,
+      "kuleshov-2018-fig1": 3
+    }
+  }
+]

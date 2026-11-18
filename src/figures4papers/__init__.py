@@ -23,5 +23,8 @@ from .diagram import DiagramCanvas, DiagramNode
 from .composer import FigureComposer
 from .vector_export import export_svg
 from .visual_qa import audit_svg, audit_palette, contrast_ratio
+from .reference_atlas import AtlasValidationError, PaperRecord, FigureRecord, SearchHit, ReferenceAtlas, reciprocal_rank_fusion
+from .design_contracts import DesignContractError, validate_design_brief, validate_scene, validate_scene_against_brief, render_scene_svg
+from .drawio_export import scene_to_drawio_xml, export_drawio
 
-__version__ = "0.2.0"
+__version__ = "0.3.0a1"

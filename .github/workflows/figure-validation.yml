@@ -33,6 +33,17 @@ jobs:
           test "$(find /tmp/figure-generated -name '*.pdf' | wc -l)" -eq 4
           test "$(find /tmp/figure-generated -name '*.svg' | wc -l)" -eq 4
           test "$(find /tmp/figure-generated -name '*.manifest.json' | wc -l)" -eq 4
+      - name: Exercise v0.3 reference retrieval and scene exports
+        env:
+          MPLBACKEND: Agg
+        run: |
+          figures4papers-reference --query "selective state space hardware-aware scan" --limit 3 > /tmp/reference-search.json
+          python -m figures4papers.retrieval_eval --k 5 --out /tmp/reference-eval.json
+          python -c 'import json; print(json.dumps(json.load(open("/tmp/reference-eval.json"))["macro_average"], indent=2))'
+          python tools/render_scene.py examples/hybrid_memory_scene.json --brief examples/hybrid_memory_design_brief.json --out /tmp/hybrid-memory
+          test -s /tmp/hybrid-memory.svg
+          test -s /tmp/hybrid-memory.drawio
+          test -s /tmp/hybrid-memory.manifest.json
       - name: Generate v0.2 publication figure benchmark
         env:
           MPLBACKEND: Agg
@@ -82,6 +93,11 @@ jobs:
         with:
           name: figure-review-python312
           path: |
+            /tmp/reference-search.json
+            /tmp/reference-eval.json
+            /tmp/hybrid-memory.svg
+            /tmp/hybrid-memory.drawio
+            /tmp/hybrid-memory.manifest.json
             /tmp/figure-generated/
             /tmp/figure-benchmark/
             /tmp/figure-benchmark-review/
